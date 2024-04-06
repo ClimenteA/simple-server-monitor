@@ -1,0 +1,125 @@
+<!doctype html>
+<html lang="en" data-theme="dark">
+
+<head>
+    <meta charset="utf-8">
+    <meta name="color-scheme" content="light dark" />
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.purple.min.css" />
+    <title>Simple server monitor</title>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <hgroup style="display: flex; flex-direction: column; align-items: center; margin-top: 2rem;">
+            <h1>Simple server monitor</h1>
+            <p>
+                View important events on your servers.
+                Events like: bugs, important user actions, critical server resources reached.
+            </p>
+        </hgroup>
+
+        <details style="margin-top: 5rem;" open>
+            <summary>View Settings</summary>
+
+            <div style="margin-top: 2rem;">
+
+                <form id="settings-form">
+
+                    <div class="grid">
+
+                        <fieldset class="grid">
+                            <label>
+                                POST URL
+                                <input type="text" name="postUrl" />
+                            </label>
+
+                            <label>
+                                REQUEST INTERVAL
+                                <input type="number" name="requestInterval" />
+                            </label>
+                        </fieldset>
+
+                        <label>
+                            API KEY
+                            <input type="password" name="apiKey" />
+                        </label>
+
+                    </div>
+
+                    <button type="submit">Save settings</button>
+
+                </form>
+
+                <table class="striped" style="margin-top: 4rem;">
+                    <thead>
+                        <tr>
+                            <th scope="col">POST URL</th>
+                            <th scope="col">REQUEST INTERVAL</th>
+                            <th scope="col">API KEY</th>
+                            <th scope="col">EDIT</th>
+                            <th scope="col">DELETE</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>Mercury</td>
+                            <td>4,880</td>
+                            <td>0.39</td>
+                            <td>
+                                <a href="#">Edit</a>
+                            </td>
+                            <td>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12,104</td>
+                            <td>12,104</td>
+                            <td>0.72</td>
+                            <td>
+                                <a href="#">Edit</a>
+                            </td>
+                            <td>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>12,742</td>
+                            <td>12,742</td>
+                            <td>1.00</td>
+                            <td>
+                                <a href="#">Edit</a>
+                            </td>
+                            <td>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td>6,779</td>
+                            <td>6,779</td>
+                            <td>1.52</td>
+                            <td>
+                                <a href="#">Edit</a>
+                            </td>
+                            <td>
+                                <a href="#">Delete</a>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+
+
+            </div>
+        </details>
+
+
+
+    </main>
+
+    <script src="./index.js" type="module" defer></script>
+
+</body>
+
+</html>

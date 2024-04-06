@@ -1,0 +1,19 @@
+{
+    "name": "Simple server monitor",
+    "description": "Get notified when important events happen on your server",
+    "version": "0.0.1",
+    "manifest_version": 3,
+    "author": "Alin Climente",
+    "background": {
+        "service_worker": "service-worker.js",
+        "type": "module"
+    },
+    "permissions": [
+        "alarms",
+        "notifications",
+        "storage"
+    ],
+    "action": {
+        "default_popup": "popup.html"
+    }
+}
