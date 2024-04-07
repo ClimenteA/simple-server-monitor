@@ -5,6 +5,18 @@
     <meta charset="utf-8">
     <meta name="color-scheme" content="light dark" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.purple.min.css" />
+
+    <style>
+        td>details {
+            margin-bottom: 0;
+        }
+
+        td>details>summary {
+            height: 52px !important;
+            width: 148px !important;
+        }
+    </style>
+
     <title>Simple server monitor</title>
 </head>
 
@@ -36,14 +48,14 @@
                             </label>
 
                             <label>
-                                REQUEST INTERVAL
+                                REQUEST INTERVAL (SS)
                                 <input type="number" name="requestInterval" />
                             </label>
                         </fieldset>
 
                         <label>
                             API KEY
-                            <input type="password" name="apiKey" />
+                            <input type="text" name="apiKey" />
                         </label>
 
                     </div>
@@ -62,54 +74,10 @@
                             <th scope="col">DELETE</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>Mercury</td>
-                            <td>4,880</td>
-                            <td>0.39</td>
-                            <td>
-                                <a href="#">Edit</a>
-                            </td>
-                            <td>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>12,104</td>
-                            <td>12,104</td>
-                            <td>0.72</td>
-                            <td>
-                                <a href="#">Edit</a>
-                            </td>
-                            <td>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>12,742</td>
-                            <td>12,742</td>
-                            <td>1.00</td>
-                            <td>
-                                <a href="#">Edit</a>
-                            </td>
-                            <td>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td>6,779</td>
-                            <td>6,779</td>
-                            <td>1.52</td>
-                            <td>
-                                <a href="#">Edit</a>
-                            </td>
-                            <td>
-                                <a href="#">Delete</a>
-                            </td>
-                        </tr>
+                    <tbody id="settings-container">
+                        <!-- Dynamic data -->
                     </tbody>
                 </table>
-
 
             </div>
         </details>
