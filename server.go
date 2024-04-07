@@ -7,42 +7,67 @@ import (
 	"os"
 	"time"
 
+	badger "github.com/dgraph-io/badger/v4"
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors"
 	"github.com/gofiber/fiber/v2/middleware/helmet"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	"github.com/gofiber/fiber/v2/middleware/recover"
+
 	"github.com/joho/godotenv"
 )
 
+type ClientInfo struct {
+	Client          string `json:"client"`
+	PostUrl         string `json:"postUrl"`
+	RequestInterval int    `json:"requestInterval"`
+	ApiKey          string `json:"apiKey"`
+	Expire          string `json:"expire"`
+}
+
 func validateApiKey(c *fiber.Ctx, key string) (bool, error) {
 
-	expire := os.Getenv(key)
-
-	currentDate := time.Now()
-
-	givenDate, err := time.Parse("2006-01-02", expire)
+	db, err := badger.Open(badger.DefaultOptions(os.Getenv("BADGER_DB_PATH")))
 	if err != nil {
-		fmt.Println("Error parsing date:", err)
-		return false, keyauth.ErrMissingOrMalformedAPIKey
+		log.Fatal(err)
 	}
+	defer db.Close()
 
-	if givenDate.Before(currentDate) {
-		fmt.Println("Client apiKey expired")
+	errdb := db.View(func(txn *badger.Txn) error {
+
+		item, err := txn.Get([]byte(key))
+		if err != nil {
+			return err
+		}
+		expire, err := item.ValueCopy(nil)
+		if err != nil {
+			return err
+		}
+
+		currentDate := time.Now()
+
+		givenDate, err := time.Parse("2006-01-02", (string(expire)))
+		if err != nil {
+			fmt.Println("Error parsing date:", err)
+			return keyauth.ErrMissingOrMalformedAPIKey
+		}
+
+		if givenDate.Before(currentDate) {
+			fmt.Println("Client apiKey expired")
+			return keyauth.ErrMissingOrMalformedAPIKey
+		}
+
+		return nil
+	})
+
+	if errdb != nil {
+		fmt.Println("Error while checking ApiKey:", errdb)
 		return false, keyauth.ErrMissingOrMalformedAPIKey
 	}
 
 	return true, nil
 
-}
-
-type ClientInfo struct {
-	Client          string `json:"client"`
-	PostUrl         string `json:"postUrl"`
-	RequestInterval string `json:"requestInterval"`
-	ApiKey          string `json:"apiKey"`
-	Expire          string `json:"expire"`
 }
 
 func getServerClients(fp string) []ClientInfo {
@@ -73,7 +98,15 @@ func getServerClients(fp string) []ClientInfo {
 
 }
 
-func setClientsEnvs(clients []ClientInfo) {
+func loadServerClientsInDb(clientsFilePath string) {
+
+	db, err := badger.Open(badger.DefaultOptions(os.Getenv("BADGER_DB_PATH")))
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer db.Close()
+
+	clients := getServerClients(clientsFilePath)
 
 	currentDate := time.Now()
 
@@ -90,9 +123,15 @@ func setClientsEnvs(clients []ClientInfo) {
 			continue
 		}
 
-		os.Setenv(client.ApiKey, client.Expire)
-	}
+		errdb := db.Update(func(txn *badger.Txn) error {
+			return txn.Set([]byte(client.ApiKey), []byte(client.Expire))
+		})
 
+		if errdb != nil {
+			fmt.Println("Error saving client ApiKey:", errdb)
+			continue
+		}
+	}
 }
 
 func main() {
@@ -105,8 +144,7 @@ func main() {
 	PORT := os.Getenv("PORT")
 	SERVER_USERS_PATH := os.Getenv("SERVER_USERS_PATH")
 
-	clients := getServerClients(SERVER_USERS_PATH)
-	setClientsEnvs(clients)
+	loadServerClientsInDb(SERVER_USERS_PATH)
 
 	app := fiber.New()
 
