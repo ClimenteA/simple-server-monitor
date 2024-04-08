@@ -11,12 +11,12 @@ import (
 )
 
 type ServerUsage struct {
-	SERVER_CPU_MAX_USAGE        float64
-	SERVER_RAM_MAX_USAGE        float64
-	SERVER_DISK_MAX_USAGE       float64
-	SERVER_USAGE_INTERVAL_CHECK int
-	TIMESTAMP                   string
-	ERROR                       string
+	CPU_MAX_USAGE        float64
+	RAM_MAX_USAGE        float64
+	DISK_MAX_USAGE       float64
+	USAGE_INTERVAL_CHECK int
+	TIMESTAMP            string
+	ERROR                string
 }
 
 func parseFloat(floatStr string) (float64, error) {
@@ -31,30 +31,30 @@ func parseFloat(floatStr string) (float64, error) {
 func getServerUsage() ServerUsage {
 
 	serverUsage := ServerUsage{
-		SERVER_CPU_MAX_USAGE:        90,
-		SERVER_RAM_MAX_USAGE:        90,
-		SERVER_DISK_MAX_USAGE:       90,
-		SERVER_USAGE_INTERVAL_CHECK: 60,
+		CPU_MAX_USAGE:        90,
+		RAM_MAX_USAGE:        90,
+		DISK_MAX_USAGE:       90,
+		USAGE_INTERVAL_CHECK: 60,
 	}
 
-	cpuMaxUsage, err := parseFloat(os.Getenv("SERVER_CPU_MAX_USAGE"))
+	cpuMaxUsage, err := parseFloat(os.Getenv("CPU_MAX_USAGE"))
 	if err == nil {
-		serverUsage.SERVER_CPU_MAX_USAGE = cpuMaxUsage
+		serverUsage.CPU_MAX_USAGE = cpuMaxUsage
 	}
 
-	ramMaxUsage, err := parseFloat(os.Getenv("SERVER_RAM_MAX_USAGE"))
+	ramMaxUsage, err := parseFloat(os.Getenv("RAM_MAX_USAGE"))
 	if err == nil {
-		serverUsage.SERVER_RAM_MAX_USAGE = ramMaxUsage
+		serverUsage.RAM_MAX_USAGE = ramMaxUsage
 	}
 
-	diskMaxUsage, err := parseFloat(os.Getenv("SERVER_DISK_MAX_USAGE"))
+	diskMaxUsage, err := parseFloat(os.Getenv("DISK_MAX_USAGE"))
 	if err == nil {
-		serverUsage.SERVER_DISK_MAX_USAGE = diskMaxUsage
+		serverUsage.DISK_MAX_USAGE = diskMaxUsage
 	}
 
-	usageIntervalCheck, err := strconv.Atoi(os.Getenv("SERVER_USAGE_INTERVAL_CHECK"))
+	usageIntervalCheck, err := strconv.Atoi(os.Getenv("USAGE_INTERVAL_CHECK"))
 	if err == nil {
-		serverUsage.SERVER_USAGE_INTERVAL_CHECK = usageIntervalCheck
+		serverUsage.USAGE_INTERVAL_CHECK = usageIntervalCheck
 	}
 
 	return serverUsage
@@ -117,13 +117,13 @@ func MonitorServerUsage() {
 		log.Printf("Ram usage: %.3f%%\n", ramUsage)
 		log.Printf("Disk usage: %.3f%%\n", diskUsage)
 
-		if cpuUsage >= serverUsage.SERVER_CPU_MAX_USAGE || ramUsage >= serverUsage.SERVER_RAM_MAX_USAGE || diskUsage >= serverUsage.SERVER_DISK_MAX_USAGE {
+		if cpuUsage >= serverUsage.CPU_MAX_USAGE || ramUsage >= serverUsage.RAM_MAX_USAGE || diskUsage >= serverUsage.DISK_MAX_USAGE {
 
 			currentServerUsage := ServerUsage{
-				SERVER_CPU_MAX_USAGE:  cpuUsage,
-				SERVER_RAM_MAX_USAGE:  ramUsage,
-				SERVER_DISK_MAX_USAGE: diskUsage,
-				TIMESTAMP:             utcIsoNow,
+				CPU_MAX_USAGE:  cpuUsage,
+				RAM_MAX_USAGE:  ramUsage,
+				DISK_MAX_USAGE: diskUsage,
+				TIMESTAMP:      utcIsoNow,
 			}
 
 			currentServerUsageJSON, err := json.Marshal(currentServerUsage)
@@ -137,16 +137,16 @@ func MonitorServerUsage() {
 
 		}
 
-		time.Sleep(time.Duration(serverUsage.SERVER_USAGE_INTERVAL_CHECK) * time.Second)
+		time.Sleep(time.Duration(serverUsage.USAGE_INTERVAL_CHECK) * time.Second)
 	}
 
 }
 
 func ParseServerUsageResults(results []map[string]string) []ServerUsage {
 
-	usageIntervalCheck, err := strconv.Atoi(os.Getenv("SERVER_USAGE_INTERVAL_CHECK"))
+	usageIntervalCheck, err := strconv.Atoi(os.Getenv("USAGE_INTERVAL_CHECK"))
 	if err != nil {
-		panic("cannot get SERVER_USAGE_INTERVAL_CHECK from envs")
+		panic("cannot get USAGE_INTERVAL_CHECK from envs")
 	}
 
 	var serverUsageResults []ServerUsage
@@ -161,15 +161,15 @@ func ParseServerUsageResults(results []map[string]string) []ServerUsage {
 					log.Println("cannot unmarshal server usage string")
 					continue
 				}
-				serverUsage.SERVER_USAGE_INTERVAL_CHECK = usageIntervalCheck
+				serverUsage.USAGE_INTERVAL_CHECK = usageIntervalCheck
 				serverUsageResults = append(serverUsageResults, serverUsage)
 
 			} else if strings.HasPrefix(key, "error-server-usage") {
 
 				serverUsage := ServerUsage{
-					SERVER_USAGE_INTERVAL_CHECK: usageIntervalCheck,
-					TIMESTAMP:                   strings.Split(key, "::")[0],
-					ERROR:                       value,
+					USAGE_INTERVAL_CHECK: usageIntervalCheck,
+					TIMESTAMP:            strings.Split(key, "::")[0],
+					ERROR:                value,
 				}
 
 				serverUsageResults = append(serverUsageResults, serverUsage)
