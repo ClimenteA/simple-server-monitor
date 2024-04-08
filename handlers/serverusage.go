@@ -16,6 +16,7 @@ type ServerUsage struct {
 	SERVER_DISK_MAX_USAGE       float64
 	SERVER_USAGE_INTERVAL_CHECK int
 	TIMESTAMP                   string
+	ERROR                       string
 }
 
 func parseFloat(floatStr string) (float64, error) {
@@ -139,4 +140,44 @@ func MonitorServerUsage() {
 		time.Sleep(time.Duration(serverUsage.SERVER_USAGE_INTERVAL_CHECK) * time.Second)
 	}
 
+}
+
+func ParseServerUsageResults(results []map[string]string) []ServerUsage {
+
+	usageIntervalCheck, err := strconv.Atoi(os.Getenv("SERVER_USAGE_INTERVAL_CHECK"))
+	if err != nil {
+		panic("cannot get SERVER_USAGE_INTERVAL_CHECK from envs")
+	}
+
+	var serverUsageResults []ServerUsage
+	for _, result := range results {
+		for key, value := range result {
+
+			if strings.HasPrefix(key, "server-usage") {
+
+				var serverUsage ServerUsage
+				err := json.Unmarshal([]byte(value), &serverUsage)
+				if err != nil {
+					log.Println("cannot unmarshal server usage string")
+					continue
+				}
+				serverUsage.SERVER_USAGE_INTERVAL_CHECK = usageIntervalCheck
+				serverUsageResults = append(serverUsageResults, serverUsage)
+
+			} else if strings.HasPrefix(key, "error-server-usage") {
+
+				serverUsage := ServerUsage{
+					SERVER_USAGE_INTERVAL_CHECK: usageIntervalCheck,
+					TIMESTAMP:                   strings.Split(key, "::")[0],
+					ERROR:                       value,
+				}
+
+				serverUsageResults = append(serverUsageResults, serverUsage)
+
+			}
+
+		}
+	}
+
+	return serverUsageResults
 }

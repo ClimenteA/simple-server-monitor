@@ -50,12 +50,13 @@ func main() {
 	})
 
 	app.Get("/", func(c *fiber.Ctx) error {
-		values, err := handlers.GetAll()
+		results, err := handlers.GetAll()
 		if err != nil {
 			c.Status(500)
-			return c.JSON(values)
+			return c.JSON(results)
 		}
-		return c.JSON(values)
+		serverResults := handlers.ParseServerUsageResults(results)
+		return c.JSON(serverResults)
 	})
 
 	app.Listen(":" + os.Getenv("PORT"))
