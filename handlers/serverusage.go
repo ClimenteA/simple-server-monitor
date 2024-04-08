@@ -2,7 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
-	"fmt"
+	"log"
 	"os"
 	"os/exec"
 	"strconv"
@@ -93,25 +93,28 @@ func MonitorServerUsage() {
 
 		cpuUsage, err := getCpuUsage()
 		if err != nil {
-			fmt.Println("Error executing the command:", err)
+			log.Println("Error executing the command:", err)
+			Set("error-server-usage-cpu::"+utcIsoNow, "failed to get cpu usage")
 			return
 		}
 
 		ramUsage, err := getRamUsage()
 		if err != nil {
-			fmt.Println("Error executing the command:", err)
+			log.Println("Error executing the command:", err)
+			Set("error-server-usage-ram::"+utcIsoNow, "failed to get ram usage")
 			return
 		}
 
 		diskUsage, err := getDiskUsage()
 		if err != nil {
-			fmt.Println("Error executing the command:", err)
+			log.Println("Error executing the command:", err)
+			Set("error-server-usage-disk::"+utcIsoNow, "failed to get disk usage")
 			return
 		}
 
-		fmt.Printf("CPU usage: %.3f%%\n", cpuUsage)
-		fmt.Printf("Ram usage: %.3f%%\n", ramUsage)
-		fmt.Printf("Disk usage: %.3f%%\n", diskUsage)
+		log.Printf("CPU usage: %.3f%%\n", cpuUsage)
+		log.Printf("Ram usage: %.3f%%\n", ramUsage)
+		log.Printf("Disk usage: %.3f%%\n", diskUsage)
 
 		currentServerUsage := ServerUsage{
 			SERVER_CPU_MAX_USAGE:  cpuUsage,
@@ -122,11 +125,12 @@ func MonitorServerUsage() {
 
 		currentServerUsageJSON, err := json.Marshal(currentServerUsage)
 		if err != nil {
-			fmt.Println("Error:", err)
+			log.Println("Error:", err)
+			Set("error-server-usage-marshal::"+utcIsoNow, "failed to convert struct to json")
 			return
 		}
 
-		Set("usage::"+utcIsoNow, string(currentServerUsageJSON))
+		Set("server-usage::"+utcIsoNow, string(currentServerUsageJSON))
 
 		time.Sleep(time.Duration(serverUsage.SERVER_USAGE_INTERVAL_CHECK) * time.Second)
 	}
