@@ -19,8 +19,56 @@ APIKEY=bdeef21a30cc0af802ac634ab2127817
 CPU_MAX_USAGE=90
 RAM_MAX_USAGE=90
 DISK_MAX_USAGE=90
-USAGE_INTERVAL_CHECK=1
+USAGE_INTERVAL_CHECK=5
 ```
 
-### TODO
+
+## Get events
+
+Get all events saved in the Badger database.
+
+Request (status code: `200` or `500`)::
+
+```shell
+curl  -X GET \
+  'http://localhost:3000' \
+  --header 'Accept: */*' \
+  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
+  --header 'ApiKey: bdeef21a30cc0af802ac634ab2127817'
+```
+
+Response (status code: `201` or `500`):
+
+```json
+{
+  "data": [
+    {
+      "Title": "Test Title",
+      "Message": "Test message",
+      "Level": "info",
+      "Timestamp": "20240408140055"
+    }
+  ]
+}
+```
+
+## Clear database
+
+Clear database if you handled some errors, upgraded your server to get some fresh events.
+
+Request:
+
+```shell
+curl  -X POST \
+  'http://localhost:3000/clear-database' \
+  --header 'Accept: */*' \
+  --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
+  --header 'ApiKey: bdeef21a30cc0af802ac634ab2127817'
+```
+
+Response (status code: `200` or `500`):
+
+```json
+{"message": "yay or nay"}
+```
 

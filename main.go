@@ -55,17 +55,28 @@ func main() {
 			c.Status(500)
 			return c.JSON(results)
 		}
-		serverResults := handlers.ParseServerUsageResults(results)
-		return c.JSON(serverResults)
+		parsedResults := handlers.ParseResults(results)
+		return c.JSON(map[string][]handlers.ServerEvent{"data": parsedResults})
+	})
+
+	app.Post("/save", func(c *fiber.Ctx) error {
+		var err error
+
+		event := new(handlers.ServerEvent)
+		if err = c.BodyParser(event); err != nil {
+			return err
+		}
+
+		err = handlers.SaveEvent(*event)
+		if err != nil {
+			c.Status(500)
+			return c.JSON(map[string]string{"message": "failed to save"})
+		}
+
+		c.Status(201)
+		return c.JSON(map[string]string{"message": "saved"})
+
 	})
 
 	app.Listen(":" + os.Getenv("PORT"))
 }
-
-// List of:
-// {
-// 	id: 'bd7acbea-c1b1-46c2-aed5-3ad53abb28ba',
-// 	title: 'First Item',
-// 	message: 'Long message here lorem The title and onPress handler are required. It is recommended to set accessibilityLabel to help make your app usable by everyone.',
-// 	timestamp: '08:30/23-03-2024',
-// }

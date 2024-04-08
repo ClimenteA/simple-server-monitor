@@ -2,6 +2,7 @@ package handlers
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"os"
 	"os/exec"
@@ -9,15 +10,6 @@ import (
 	"strings"
 	"time"
 )
-
-type ServerUsage struct {
-	CPU_MAX_USAGE        float64
-	RAM_MAX_USAGE        float64
-	DISK_MAX_USAGE       float64
-	USAGE_INTERVAL_CHECK int
-	TIMESTAMP            string
-	ERROR                string
-}
 
 func parseFloat(floatStr string) (float64, error) {
 	cleanFloat := strings.TrimSuffix(strings.TrimSpace(floatStr), "%")
@@ -113,71 +105,27 @@ func MonitorServerUsage() {
 			return
 		}
 
-		log.Printf("CPU usage: %.3f%%\n", cpuUsage)
-		log.Printf("Ram usage: %.3f%%\n", ramUsage)
-		log.Printf("Disk usage: %.3f%%\n", diskUsage)
-
 		if cpuUsage >= serverUsage.CPU_MAX_USAGE || ramUsage >= serverUsage.RAM_MAX_USAGE || diskUsage >= serverUsage.DISK_MAX_USAGE {
 
-			currentServerUsage := ServerUsage{
-				CPU_MAX_USAGE:  cpuUsage,
-				RAM_MAX_USAGE:  ramUsage,
-				DISK_MAX_USAGE: diskUsage,
-				TIMESTAMP:      utcIsoNow,
+			event := ServerEvent{
+				Title:     "Server resources",
+				Message:   fmt.Sprintf("Server resources have reached critical levels. CPU: %.3f%%, RAM: %.3f%%, DISK: %.3f%%", cpuUsage, ramUsage, diskUsage),
+				Level:     "warning",
+				Timestamp: utcIsoNow,
 			}
 
-			currentServerUsageJSON, err := json.Marshal(currentServerUsage)
+			currentEventJSON, err := json.Marshal(event)
 			if err != nil {
 				log.Println("Error:", err)
-				Set("error-server-usage-marshal::"+utcIsoNow, "failed to convert struct to json")
+				Set("error-event-marshal::"+utcIsoNow, "failed to convert struct to json on MonitorServerUsage")
 				return
 			}
 
-			Set("server-usage::"+utcIsoNow, string(currentServerUsageJSON))
+			Set("event::"+utcIsoNow, string(currentEventJSON))
 
 		}
 
 		time.Sleep(time.Duration(serverUsage.USAGE_INTERVAL_CHECK) * time.Second)
 	}
 
-}
-
-func ParseServerUsageResults(results []map[string]string) []ServerUsage {
-
-	usageIntervalCheck, err := strconv.Atoi(os.Getenv("USAGE_INTERVAL_CHECK"))
-	if err != nil {
-		panic("cannot get USAGE_INTERVAL_CHECK from envs")
-	}
-
-	var serverUsageResults []ServerUsage
-	for _, result := range results {
-		for key, value := range result {
-
-			if strings.HasPrefix(key, "server-usage") {
-
-				var serverUsage ServerUsage
-				err := json.Unmarshal([]byte(value), &serverUsage)
-				if err != nil {
-					log.Println("cannot unmarshal server usage string")
-					continue
-				}
-				serverUsage.USAGE_INTERVAL_CHECK = usageIntervalCheck
-				serverUsageResults = append(serverUsageResults, serverUsage)
-
-			} else if strings.HasPrefix(key, "error-server-usage") {
-
-				serverUsage := ServerUsage{
-					USAGE_INTERVAL_CHECK: usageIntervalCheck,
-					TIMESTAMP:            strings.Split(key, "::")[0],
-					ERROR:                value,
-				}
-
-				serverUsageResults = append(serverUsageResults, serverUsage)
-
-			}
-
-		}
-	}
-
-	return serverUsageResults
 }
