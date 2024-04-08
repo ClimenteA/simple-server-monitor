@@ -45,9 +45,65 @@ func Get(key string) (string, error) {
 	return value, err
 }
 
+func GetAll() ([]map[string]string, error) {
+
+	values := []map[string]string{}
+
+	err := BadgerDB.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Rewind(); it.Valid(); it.Next() {
+			item := it.Item()
+			key := item.Key()
+			value, err := item.ValueCopy(nil)
+			if err != nil {
+				return err
+			}
+			values = append(values, map[string]string{string(key): string(value)})
+		}
+		return nil
+	})
+
+	return values, err
+
+}
+
 func Del(key string) error {
 	err := BadgerDB.Update(func(txn *badger.Txn) error {
 		return txn.Delete([]byte(key))
 	})
 	return err
+}
+
+func Clear() error {
+	BadgerDB.RunValueLogGC(0.9)
+
+	var keys [][]byte
+	err := BadgerDB.View(func(txn *badger.Txn) error {
+		opts := badger.DefaultIteratorOptions
+		opts.PrefetchValues = false
+		it := txn.NewIterator(opts)
+		defer it.Close()
+		for it.Rewind(); it.Valid(); it.Next() {
+			keys = append(keys, it.Item().KeyCopy(nil))
+		}
+		return nil
+	})
+
+	if err != nil {
+		return err
+	}
+
+	for _, key := range keys {
+		err := BadgerDB.Update(func(txn *badger.Txn) error {
+			return txn.Delete(key)
+		})
+		if err != nil {
+			return err
+		}
+	}
+
+	return nil
 }

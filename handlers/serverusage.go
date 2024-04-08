@@ -116,21 +116,25 @@ func MonitorServerUsage() {
 		log.Printf("Ram usage: %.3f%%\n", ramUsage)
 		log.Printf("Disk usage: %.3f%%\n", diskUsage)
 
-		currentServerUsage := ServerUsage{
-			SERVER_CPU_MAX_USAGE:  cpuUsage,
-			SERVER_RAM_MAX_USAGE:  ramUsage,
-			SERVER_DISK_MAX_USAGE: diskUsage,
-			TIMESTAMP:             utcIsoNow,
-		}
+		if cpuUsage >= serverUsage.SERVER_CPU_MAX_USAGE || ramUsage >= serverUsage.SERVER_RAM_MAX_USAGE || diskUsage >= serverUsage.SERVER_DISK_MAX_USAGE {
 
-		currentServerUsageJSON, err := json.Marshal(currentServerUsage)
-		if err != nil {
-			log.Println("Error:", err)
-			Set("error-server-usage-marshal::"+utcIsoNow, "failed to convert struct to json")
-			return
-		}
+			currentServerUsage := ServerUsage{
+				SERVER_CPU_MAX_USAGE:  cpuUsage,
+				SERVER_RAM_MAX_USAGE:  ramUsage,
+				SERVER_DISK_MAX_USAGE: diskUsage,
+				TIMESTAMP:             utcIsoNow,
+			}
 
-		Set("server-usage::"+utcIsoNow, string(currentServerUsageJSON))
+			currentServerUsageJSON, err := json.Marshal(currentServerUsage)
+			if err != nil {
+				log.Println("Error:", err)
+				Set("error-server-usage-marshal::"+utcIsoNow, "failed to convert struct to json")
+				return
+			}
+
+			Set("server-usage::"+utcIsoNow, string(currentServerUsageJSON))
+
+		}
 
 		time.Sleep(time.Duration(serverUsage.SERVER_USAGE_INTERVAL_CHECK) * time.Second)
 	}

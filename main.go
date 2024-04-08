@@ -39,8 +39,23 @@ func main() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 
+	app.Post("/clear-database", func(c *fiber.Ctx) error {
+		err := handlers.Clear()
+		if err != nil {
+			log.Println(err)
+			c.Status(500)
+			return c.JSON(map[string]string{"message": "cannot clear database"})
+		}
+		return c.JSON(map[string]string{"message": "database cleared"})
+	})
+
 	app.Get("/", func(c *fiber.Ctx) error {
-		return c.SendString("Hello, World!")
+		values, err := handlers.GetAll()
+		if err != nil {
+			c.Status(500)
+			return c.JSON(values)
+		}
+		return c.JSON(values)
 	})
 
 	app.Listen(":" + os.Getenv("PORT"))
