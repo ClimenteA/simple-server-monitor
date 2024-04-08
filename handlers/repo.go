@@ -14,10 +14,10 @@ func init() {
 	cwd, _ := os.Getwd()
 	badgerPath := filepath.Join(cwd, ".badger")
 
-	var err error
-	BadgerDB, err = badger.Open(badger.DefaultOptions(badgerPath))
-	if err != nil {
-		log.Fatal(err)
+	var dberr error
+	BadgerDB, dberr = badger.Open(badger.DefaultOptions(badgerPath))
+	if dberr != nil {
+		log.Fatal(dberr)
 	}
 }
 

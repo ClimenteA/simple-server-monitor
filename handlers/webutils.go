@@ -10,6 +10,7 @@ import (
 var APIKEY = os.Getenv("APIKEY")
 
 func ValidateApiKey(c *fiber.Ctx, key string) (bool, error) {
+
 	if APIKEY == key {
 		return true, nil
 	}

@@ -2,6 +2,13 @@ const settingsForm = document.getElementById("settings-form")
 const urlElem = document.querySelector('[name="url"]')
 const requestIntervalElem = document.querySelector('[name="requestInterval"]')
 const apiKeyElem = document.querySelector('[name="apiKey"]')
+const clearDBElem = document.getElementById("clear-database")
+
+
+clearDBElem.addEventListener("click", async function (event) {
+    event.preventDefault()
+    // TODO
+})
 
 
 settingsForm.addEventListener("submit", async function (event) {

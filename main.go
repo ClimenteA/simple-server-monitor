@@ -23,6 +23,8 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
+	go handlers.MonitorServerUsage()
+
 	defer handlers.BadgerDB.Close()
 
 	app := fiber.New()
