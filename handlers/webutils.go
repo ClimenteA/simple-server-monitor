@@ -1,15 +1,17 @@
 package handlers
 
 import (
+	"os"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/keyauth"
 )
 
-func ValidateApiKey(c *fiber.Ctx, key string) (bool, error) {
+var APIKEY = os.Getenv("APIKEY")
 
-	err := validApiKey(key)
-	if err != nil {
-		return false, keyauth.ErrMissingOrMalformedAPIKey
+func ValidateApiKey(c *fiber.Ctx, key string) (bool, error) {
+	if APIKEY == key {
+		return true, nil
 	}
-	return true, nil
+	return false, keyauth.ErrMissingOrMalformedAPIKey
 }

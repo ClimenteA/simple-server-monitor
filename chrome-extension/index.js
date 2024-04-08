@@ -1,5 +1,5 @@
 const settingsForm = document.getElementById("settings-form")
-const postUrlElem = document.querySelector('[name="postUrl"]')
+const urlElem = document.querySelector('[name="url"]')
 const requestIntervalElem = document.querySelector('[name="requestInterval"]')
 const apiKeyElem = document.querySelector('[name="apiKey"]')
 
@@ -11,14 +11,28 @@ settingsForm.addEventListener("submit", async function (event) {
 
     console.log(data)
 
-    clearForm()
-    appendRow(data)
+    const response = await fetch(data.url, {
+        method: "POST",
+        body: JSON.stringify(data)
+    })
+
+    if (response.status == 200) {
+
+        const jsonResponse = await response.json()
+        console.log(jsonResponse)
+
+        clearForm()
+        appendRow(data)
+
+    } else {
+        console.error(response)
+    }
 
 })
 
 
 function clearForm() {
-    postUrlElem.value = null
+    urlElem.value = null
     requestIntervalElem.value = null
     apiKeyElem.value = null
 }
@@ -61,7 +75,7 @@ function appendRow(data) {
     row.appendChild(deleteCell)
 
     editCell.addEventListener("click", () => {
-        postUrlElem.value = data.postUrl
+        urlElem.value = data.url
         requestIntervalElem.value = data.requestInterval
         apiKeyElem.value = data.apiKey
         row.remove()
@@ -109,6 +123,6 @@ function appendRow(data) {
 // })
 
 
-// // postUrl: null,
+// // url: null,
 // // requestInterval: null,
 // // apiKey: null,

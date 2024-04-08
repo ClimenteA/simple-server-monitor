@@ -1,21 +1,10 @@
 <!doctype html>
-<html lang="en" data-theme="dark">
+<html lang="en" data-theme="light">
 
 <head>
     <meta charset="utf-8">
     <meta name="color-scheme" content="light dark" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.purple.min.css" />
-
-    <style>
-        td>details {
-            margin-bottom: 0;
-        }
-
-        td>details>summary {
-            height: 52px !important;
-            width: 148px !important;
-        }
-    </style>
 
     <title>Simple server monitor</title>
 </head>
@@ -43,8 +32,8 @@
 
                         <fieldset class="grid">
                             <label>
-                                POST URL
-                                <input type="text" name="postUrl" />
+                                URL
+                                <input type="text" name="url" />
                             </label>
 
                             <label>
@@ -67,7 +56,7 @@
                 <table class="striped" style="margin-top: 4rem;">
                     <thead>
                         <tr>
-                            <th scope="col">POST URL</th>
+                            <th scope="col">URL</th>
                             <th scope="col">REQUEST INTERVAL</th>
                             <th scope="col">API KEY</th>
                             <th scope="col">EDIT</th>
