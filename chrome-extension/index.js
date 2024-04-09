@@ -21,14 +21,14 @@ document.addEventListener("DOMContentLoaded", init)
 
 clearDBElem.addEventListener("click", async function (event) {
     event.preventDefault()
-    // TODO
-    // chrome.storage.sync.set({ 'settings': null })
+
+    chrome.storage.sync.set({ 'settings': null })
     chrome.storage.local.set({ 'events': null })
 
     chrome.storage.sync.get(['settings'], async function (items) {
         if (!items.settings) return
 
-        for (const data of items.settings) {
+        for (const data of Object.values(items.settings)) {
 
             if (data.apiKey.length == 0) continue
 
@@ -54,7 +54,7 @@ settingsCloseElem.addEventListener("click", () => settingsModalElem.removeAttrib
 function createSettingsTable() {
     chrome.storage.sync.get(['settings'], function (items) {
         if (!items.settings) return
-        for (const data of items.settings) appendSettingsRow(data)
+        for (const data of Object.values(items.settings)) appendSettingsRow(data)
     })
 }
 
@@ -76,7 +76,7 @@ async function setEvents() {
             if (!items.events) items.events = {}
 
             let events = items.events
-            for (const data of settingsItems.settings) {
+            for (const data of Object.values(settingsItems.settings)) {
 
                 if (data.apiKey.length == 0) continue
 
@@ -116,17 +116,38 @@ settingsForm.addEventListener("submit", async function (event) {
     const formData = new FormData(event.target)
     const data = Object.fromEntries(formData.entries())
 
+
+    if (!(data.url.startsWith("http://") || data.url.startsWith("https://"))) {
+        alert("Not a valid url")
+        return
+    }
+
+    if (data.apiKey.length == 0) {
+        alert("Not a valid apiKey")
+        return
+    }
+
     chrome.storage.sync.get(['settings'], function (items) {
-        if (!items.settings) items.settings = []
-        items.settings = [...items.settings, data]
+        if (!items.settings) items.settings = {}
+        items.settings[data.url] = data
         chrome.storage.sync.set({ 'settings': items.settings })
     })
 
     clearForm()
     appendSettingsRow(data)
+    await setAlarm(data)
 
 })
 
+
+async function setAlarm(data) {
+
+    await chrome.alarms.create(data.url, {
+        delayInMinutes: 1,
+        periodInMinutes: Number(data.requestInterval)
+    })
+
+}
 
 function clearForm() {
     urlElem.value = null
@@ -200,16 +221,26 @@ function appendEventsRow(data) {
 
 function appendSettingsRow(data) {
 
+    console.log("Settings row:", data)
+
     let count = 0
     for (const key in data) if (data[key]) count += 1
     if (Object.values(data).length != count) return
 
     const row = document.createElement("tr")
-    for (const key in data) {
-        const cell = document.createElement("td")
-        cell.innerText = data[key]
-        row.appendChild(cell)
-    }
+
+    const urlCell = document.createElement("td")
+    urlCell.innerText = data.url
+    row.appendChild(urlCell)
+
+    const reqInterCell = document.createElement("td")
+    reqInterCell.innerText = data.requestInterval
+    row.appendChild(reqInterCell)
+
+    const apiKeyCell = document.createElement("td")
+    apiKeyCell.innerText = data.apiKey
+    row.appendChild(apiKeyCell)
+
 
     const editCell = document.createElement("td")
     const deleteCell = document.createElement("td")
@@ -242,7 +273,7 @@ function appendSettingsRow(data) {
     deleteCell.addEventListener("click", () => {
         chrome.storage.sync.get(['settings'], function (items) {
             if (!items.settings) return
-            items.settings = items.settings.filter(item => item.apiKey != data.apiKey)
+            delete items.settings[data.url]
             chrome.storage.sync.set({ 'settings': items.settings })
         })
         row.remove()
