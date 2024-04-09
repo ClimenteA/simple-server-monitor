@@ -9,6 +9,8 @@ import (
 	"strconv"
 	"strings"
 	"time"
+
+	"github.com/google/uuid"
 )
 
 func parseFloat(floatStr string) (float64, error) {
@@ -107,7 +109,10 @@ func MonitorServerUsage() {
 
 		if cpuUsage >= serverUsage.CPU_MAX_USAGE || ramUsage >= serverUsage.RAM_MAX_USAGE || diskUsage >= serverUsage.DISK_MAX_USAGE {
 
+			eventId := uuid.NewString()
+
 			event := ServerEvent{
+				EventId:   eventId,
 				Title:     "Server resources",
 				Message:   fmt.Sprintf("Server resources have reached critical levels. CPU: %.3f%%, RAM: %.3f%%, DISK: %.3f%%", cpuUsage, ramUsage, diskUsage),
 				Level:     "warning",
@@ -121,7 +126,7 @@ func MonitorServerUsage() {
 				return
 			}
 
-			Set("event::"+utcIsoNow, string(currentEventJSON))
+			Set("event::"+eventId, string(currentEventJSON))
 
 		}
 

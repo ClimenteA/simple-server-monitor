@@ -39,16 +39,6 @@ func main() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 
-	app.Post("/clear-database", func(c *fiber.Ctx) error {
-		err := handlers.Clear()
-		if err != nil {
-			log.Println(err)
-			c.Status(500)
-			return c.JSON(map[string]string{"message": "cannot clear database"})
-		}
-		return c.JSON(map[string]string{"message": "database cleared"})
-	})
-
 	app.Get("/", func(c *fiber.Ctx) error {
 		results, err := handlers.GetAll()
 		if err != nil {
@@ -76,6 +66,32 @@ func main() {
 		c.Status(201)
 		return c.JSON(map[string]string{"message": "saved"})
 
+	})
+
+	app.Delete("/delete/:eventId", func(c *fiber.Ctx) error {
+		var err error
+
+		eventId := c.Params("eventId")
+
+		err = handlers.DeleteEvent(eventId)
+		if err != nil {
+			c.Status(500)
+			return c.JSON(map[string]string{"message": "failed to delete"})
+		}
+
+		c.Status(200)
+		return c.JSON(map[string]string{"message": "deleted"})
+
+	})
+
+	app.Post("/clear-database", func(c *fiber.Ctx) error {
+		err := handlers.Clear()
+		if err != nil {
+			log.Println(err)
+			c.Status(500)
+			return c.JSON(map[string]string{"message": "cannot clear database"})
+		}
+		return c.JSON(map[string]string{"message": "database cleared"})
 	})
 
 	app.Listen(":" + os.Getenv("PORT"))

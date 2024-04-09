@@ -1,6 +1,7 @@
 package handlers
 
 type ServerEvent struct {
+	EventId   string
 	Title     string
 	Message   string
 	Level     string
