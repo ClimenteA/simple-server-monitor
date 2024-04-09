@@ -88,7 +88,7 @@ func main() {
 
 	})
 
-	app.Post("/clear-database", func(c *fiber.Ctx) error {
+	app.Delete("/clear-database", func(c *fiber.Ctx) error {
 		err := handlers.Clear()
 		if err != nil {
 			log.Println(err)
