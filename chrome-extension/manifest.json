@@ -8,10 +8,16 @@
         "service_worker": "service-worker.js",
         "type": "module"
     },
+    "host_permissions": [
+        "http://*/*",
+        "https://*/*"
+    ],
     "permissions": [
         "alarms",
         "notifications",
-        "storage"
+        "storage",
+        "unlimitedStorage",
+        "scripting"
     ],
     "action": {
         "default_popup": "popup.html"

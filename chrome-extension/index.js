@@ -6,17 +6,86 @@ const clearDBElem = document.getElementById("clear-database")
 const settingsOpenElem = document.getElementById("open-settings")
 const settingsCloseElem = document.getElementById("close-settings")
 const settingsModalElem = document.getElementById("settings-modal")
+const settingsContainer = document.getElementById("settings-container")
+
+
+document.addEventListener("DOMContentLoaded", async () => {
+
+    await setEvents()
+    createEventsTable()
+    createSettingsTable()
+
+})
+
 
 settingsOpenElem.addEventListener("click", () => settingsModalElem.setAttribute("open", null))
 settingsCloseElem.addEventListener("click", () => settingsModalElem.removeAttribute("open"))
 
 
-document.addEventListener("DOMContentLoaded", () => {
+function createSettingsTable() {
     chrome.storage.sync.get(['settings'], function (items) {
         if (!items.settings) return
-        for (const data of items.settings) appendRow(data)
+        for (const data of items.settings) appendSettingsRow(data)
     })
-})
+}
+
+
+function createEventsTable() {
+    chrome.storage.local.get(['events'], function (items) {
+        if (!items.events) return
+        for (const data of items.events) appendEventsRow(data)
+    })
+}
+
+async function setEvents() {
+
+    chrome.storage.sync.get(['settings'], function (settingsItems) {
+        if (!settingsItems.settings) return
+
+        chrome.storage.local.get(['events'], async function (items) {
+
+            if (!items.events) items.events = []
+
+            let events = items.events
+            for (const data of settingsItems.settings) {
+
+                const response = await fetch(data.url, {
+                    method: "GET",
+                    headers: { mode: "no-cors", "Content-Type": "application/json", "ApiKey": data.apiKey }
+                })
+
+                if (response.status != 200) {
+                    const now = new Date()
+                    const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)
+
+                    events.push({
+                        EventId: timestamp,
+                        Title: "Cannot fetch events",
+                        Message: `Used settings: ${data}`,
+                        Level: "critical",
+                        Timestamp: timestamp
+                    })
+
+                    continue
+                }
+
+                const receviedEvents = await response.json()
+                events = [...events, ...receviedEvents.data]
+
+            }
+
+            let eventsNoDuplicates = {}
+            for (const event of events) eventsNoDuplicates[event.EventId] = event
+            events = Object.values(eventsNoDuplicates)
+
+            chrome.storage.local.set({ 'events': events })
+
+        })
+
+    })
+
+}
+
 
 
 clearDBElem.addEventListener("click", async function (event) {
@@ -30,8 +99,6 @@ settingsForm.addEventListener("submit", async function (event) {
     const formData = new FormData(event.target)
     const data = Object.fromEntries(formData.entries())
 
-    console.log(data)
-
     chrome.storage.sync.get(['settings'], function (items) {
         if (!items.settings) items.settings = []
         items.settings = [...items.settings, data]
@@ -39,7 +106,7 @@ settingsForm.addEventListener("submit", async function (event) {
     })
 
     clearForm()
-    appendRow(data)
+    appendSettingsRow(data)
 
 })
 
@@ -51,9 +118,13 @@ function clearForm() {
 }
 
 
-function appendRow(data) {
+function appendEventsRow(data) {
+    console.log(data)
+    
+}
 
-    const settingsContainer = document.getElementById("settings-container")
+
+function appendSettingsRow(data) {
 
     let count = 0
     for (const key in data) if (data[key]) count += 1
