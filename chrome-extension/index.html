@@ -6,6 +6,26 @@
     <meta name="color-scheme" content="light dark" />
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@2/css/pico.purple.min.css" />
 
+    <style>
+        .tag {
+            text-decoration: none;
+            background: whitesmoke;
+            color: initial;
+            padding-top: 8px;
+            border-radius: 15px;
+            padding-bottom: 8px;
+            padding-left: 12px;
+            padding-right: 12px;
+            margin-left: 5px;
+            margin-right: 5px;
+        }
+
+        .tag:hover {
+            color: darkblue;
+            background: white;
+            border: 2px solid whitesmoke;
+        }
+    </style>
     <title>Simple server monitor</title>
 </head>
 
@@ -21,16 +41,21 @@
             </p>
         </hgroup>
 
-        <details style="margin-top: 5rem;" open>
-            <summary>View Settings</summary>
+        <dialog id="settings-modal">
+            <article>
+                <header>
+                    <button id="close-settings" aria-label="Close" rel="prev"></button>
+                    <p>
+                        <strong>Add here connection info to servers</strong>
+                    </p>
+                </header>
 
-            <div style="margin-top: 2rem;">
+                <div>
 
-                <form id="settings-form">
+                    <form id="settings-form">
 
-                    <div class="grid">
+                        <fieldset>
 
-                        <fieldset class="grid">
                             <label>
                                 URL
                                 <input type="text" name="url" />
@@ -40,40 +65,59 @@
                                 REQUEST INTERVAL (SS)
                                 <input type="number" name="requestInterval" />
                             </label>
+
+                            <label>
+                                API KEY
+                                <input type="text" name="apiKey" />
+                            </label>
+
                         </fieldset>
 
-                        <label>
-                            API KEY
-                            <input type="text" name="apiKey" />
-                        </label>
+                        <button type="submit">Save settings</button>
 
-                    </div>
+                    </form>
 
-                    <button type="submit">Save settings</button>
+                    <table class="striped" style="margin-top: 4rem;">
+                        <thead>
+                            <tr>
+                                <th scope="col">URL</th>
+                                <th scope="col">REQUEST INTERVAL</th>
+                                <th scope="col">API KEY</th>
+                                <th scope="col">EDIT</th>
+                                <th scope="col">DELETE</th>
+                            </tr>
+                        </thead>
+                        <tbody id="settings-container">
+                            <!-- Dynamic data -->
+                        </tbody>
+                    </table>
 
-                    <a style="float: right;" href="#" id="clear-database">Clear server database</a>
+                </div>
+            </article>
+        </dialog>
 
-                </form>
-
-                <table class="striped" style="margin-top: 4rem;">
-                    <thead>
-                        <tr>
-                            <th scope="col">URL</th>
-                            <th scope="col">REQUEST INTERVAL</th>
-                            <th scope="col">API KEY</th>
-                            <th scope="col">EDIT</th>
-                            <th scope="col">DELETE</th>
-                        </tr>
-                    </thead>
-                    <tbody id="settings-container">
-                        <!-- Dynamic data -->
-                    </tbody>
-                </table>
-
-            </div>
-        </details>
+        <a id="open-settings" class="tag" href="#">View Settings</a>
+        <a id="clear-database" class="tag" href="#">Clear server database</a>
 
 
+        <div id="events">
+            <p style="margin-top: 4rem;">Latest events from your server(s):</p>
+            <table class="striped">
+                <thead>
+                    <tr>
+                        <th scope="col">Level</th>
+                        <th scope="col">Title</th>
+                        <th scope="col">Message</th>
+                        <th scope="col">Timestamp</th>
+                        <th scope="col">Url</th>
+                        <th scope="col">Delete</th>
+                    </tr>
+                </thead>
+                <tbody id="events-container">
+                    <!-- Dynamic data -->
+                </tbody>
+            </table>
+        </div>
 
     </main>
 

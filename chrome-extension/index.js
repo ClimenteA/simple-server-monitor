@@ -3,6 +3,20 @@ const urlElem = document.querySelector('[name="url"]')
 const requestIntervalElem = document.querySelector('[name="requestInterval"]')
 const apiKeyElem = document.querySelector('[name="apiKey"]')
 const clearDBElem = document.getElementById("clear-database")
+const settingsOpenElem = document.getElementById("open-settings")
+const settingsCloseElem = document.getElementById("close-settings")
+const settingsModalElem = document.getElementById("settings-modal")
+
+settingsOpenElem.addEventListener("click", () => settingsModalElem.setAttribute("open", null))
+settingsCloseElem.addEventListener("click", () => settingsModalElem.removeAttribute("open"))
+
+
+document.addEventListener("DOMContentLoaded", () => {
+    chrome.storage.sync.get(['settings'], function (items) {
+        if (!items.settings) return
+        for (const data of items.settings) appendRow(data)
+    })
+})
 
 
 clearDBElem.addEventListener("click", async function (event) {
@@ -18,22 +32,14 @@ settingsForm.addEventListener("submit", async function (event) {
 
     console.log(data)
 
-    const response = await fetch(data.url, {
-        method: "POST",
-        body: JSON.stringify(data)
+    chrome.storage.sync.get(['settings'], function (items) {
+        if (!items.settings) items.settings = []
+        items.settings = [...items.settings, data]
+        chrome.storage.sync.set({ 'settings': items.settings })
     })
 
-    if (response.status == 200) {
-
-        const jsonResponse = await response.json()
-        console.log(jsonResponse)
-
-        clearForm()
-        appendRow(data)
-
-    } else {
-        console.error(response)
-    }
+    clearForm()
+    appendRow(data)
 
 })
 
@@ -88,48 +94,15 @@ function appendRow(data) {
         row.remove()
     })
 
-    deleteCell.addEventListener("click", () => row.remove())
+    deleteCell.addEventListener("click", () => {
+        chrome.storage.sync.get(['settings'], function (items) {
+            if (!items.settings) return
+            items.settings = items.settings.filter(item => item.apiKey != data.apiKey)
+            chrome.storage.sync.set({ 'settings': items.settings })
+        })
+        row.remove()
+    })
 
     settingsContainer.appendChild(row)
 
 }
-
-
-
-// chrome.storage.sync.set({ 'viewEvents': false })
-
-// const toggleEventsBtn = document.getElementById("view-server-events")
-
-// toggleEventsBtn.addEventListener("click", () => {
-//     chrome.storage.sync.set({ 'viewEvents': true })
-//     chrome.tabs.create({ url: "popup.html" })
-// })
-
-
-// chrome.storage.sync.get(['viewEvents'], function (items) {
-
-//     const contentElem = document.getElementById("content")
-
-//     if (!items.viewEvents) {
-//         contentElem.style.display = "none"
-//     } else {
-//         contentElem.style.display = "block"
-
-//         const settingsForm = document.getElementById("settings-form")
-
-//         settingsForm.addEventListener("submit", async function (event) {
-//             event.preventDefault()
-//             const formData = new FormData(event.target)
-//             const data = Object.fromEntries(formData.entries())
-
-//             console.log(data)
-//         })
-
-//     }
-
-// })
-
-
-// // url: null,
-// // requestInterval: null,
-// // apiKey: null,
