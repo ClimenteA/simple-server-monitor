@@ -22,6 +22,7 @@ document.addEventListener("DOMContentLoaded", init)
 clearDBElem.addEventListener("click", async function (event) {
     event.preventDefault()
 
+    await chrome.alarms.clearAll()
     chrome.storage.sync.set({ 'settings': null })
     chrome.storage.local.set({ 'events': null })
 
@@ -79,8 +80,6 @@ async function setEvents() {
             for (const data of Object.values(settingsItems.settings)) {
 
                 if (data.apiKey.length == 0) continue
-
-                console.log("Get events with settings", data)
 
                 const response = await fetch(data.url, {
                     method: "GET",
@@ -141,6 +140,8 @@ settingsForm.addEventListener("submit", async function (event) {
 
 
 async function setAlarm(data) {
+
+    await chrome.alarms.clear(data.url)
 
     await chrome.alarms.create(data.url, {
         delayInMinutes: 1,
@@ -221,8 +222,6 @@ function appendEventsRow(data) {
 
 function appendSettingsRow(data) {
 
-    console.log("Settings row:", data)
-
     let count = 0
     for (const key in data) if (data[key]) count += 1
     if (Object.values(data).length != count) return
@@ -270,12 +269,15 @@ function appendSettingsRow(data) {
         row.remove()
     })
 
-    deleteCell.addEventListener("click", () => {
+    deleteCell.addEventListener("click", async () => {
         chrome.storage.sync.get(['settings'], function (items) {
             if (!items.settings) return
             delete items.settings[data.url]
             chrome.storage.sync.set({ 'settings': items.settings })
         })
+
+        await chrome.alarms.clear(data.url)
+
         row.remove()
     })
 
