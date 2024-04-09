@@ -8,6 +8,7 @@ const settingsCloseElem = document.getElementById("close-settings")
 const settingsModalElem = document.getElementById("settings-modal")
 const settingsContainer = document.getElementById("settings-container")
 const eventsContainer = document.getElementById("events-container")
+const clearEventsElem = document.getElementById("clear-events")
 
 
 async function init() {
@@ -18,6 +19,12 @@ async function init() {
 
 document.addEventListener("DOMContentLoaded", init)
 
+
+clearEventsElem.addEventListener("click", async function (event) {
+    event.preventDefault()
+    chrome.storage.local.set({ 'events': null })
+    location.reload()
+})
 
 clearDBElem.addEventListener("click", async function (event) {
     event.preventDefault()
@@ -48,8 +55,15 @@ clearDBElem.addEventListener("click", async function (event) {
     location.reload()
 })
 
-settingsOpenElem.addEventListener("click", () => settingsModalElem.setAttribute("open", null))
-settingsCloseElem.addEventListener("click", () => settingsModalElem.removeAttribute("open"))
+settingsOpenElem.addEventListener("click", () => {
+    document.body.classList.add("modal-is-open")
+    settingsModalElem.setAttribute("open", null)
+})
+
+settingsCloseElem.addEventListener("click", () => {
+    document.body.classList.remove("modal-is-open")
+    settingsModalElem.removeAttribute("open")
+})
 
 
 function createSettingsTable() {
@@ -156,6 +170,12 @@ function clearForm() {
     apiKeyElem.value = null
 }
 
+function convertUtcToLocaleTimeString(utcIsoFormatString) {
+    const utcDate = new Date(`${utcIsoFormatString.slice(0, 4)}-${utcIsoFormatString.slice(4, 6)}-${utcIsoFormatString.slice(6, 8)}T${utcIsoFormatString.slice(8, 10)}:${utcIsoFormatString.slice(10, 12)}:${utcIsoFormatString.slice(12, 14)}.000Z`)
+    const options = { year: 'numeric', month: 'long', day: 'numeric', hour: '2-digit', minute: '2-digit', second: '2-digit' }
+    const localTime = utcDate.toLocaleString(undefined, options)
+    return localTime
+}
 
 function appendEventsRow(data) {
 
@@ -173,13 +193,13 @@ function appendEventsRow(data) {
     messageCell.innerText = data.Message
     row.appendChild(messageCell)
 
-    const timestampCell = document.createElement("td")
-    timestampCell.innerText = data.Timestamp
-    row.appendChild(timestampCell)
-
     const urlCell = document.createElement("td")
     urlCell.innerText = data.Origin.url
     row.appendChild(urlCell)
+
+    const timestampCell = document.createElement("td")
+    timestampCell.innerText = convertUtcToLocaleTimeString(data.Timestamp)
+    row.appendChild(timestampCell)
 
     const deleteCell = document.createElement("td")
     const deleteCellLink = document.createElement("a")

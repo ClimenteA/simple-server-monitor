@@ -50,6 +50,7 @@ func main() {
 			return c.JSON(results)
 		}
 		parsedResults := handlers.ParseResults(results)
+		handlers.Clear()
 		return c.JSON(map[string][]handlers.ServerEvent{"data": parsedResults})
 	})
 

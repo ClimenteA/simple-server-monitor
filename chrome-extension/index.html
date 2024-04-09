@@ -25,7 +25,7 @@
         }
 
         dialog article {
-            max-width: 100% !important;
+            max-width: 1200px !important;
         }
     </style>
     <title>Simple server monitor</title>
@@ -97,8 +97,8 @@
         </dialog>
 
         <a id="open-settings" class="tag" href="#">🔧 View Settings</a>
+        <a id="clear-events" class="tag" href="#">🧹 Clear events</a>
         <a id="clear-database" class="tag" href="#">💥 Nuke all data</a>
-
 
         <div id="events">
             <p style="margin-top: 4rem;">Latest events from your server(s):</p>
@@ -108,8 +108,8 @@
                         <th scope="col">Level</th>
                         <th scope="col">Title</th>
                         <th scope="col">Message</th>
-                        <th scope="col">Timestamp</th>
                         <th scope="col">Url</th>
+                        <th scope="col">Timestamp</th>
                         <th scope="col">Delete</th>
                     </tr>
                 </thead>
