@@ -1,4 +1,4 @@
-# Simple server monitor
+# Is My Server Ok
 
 Monitor your web apps with a simple chrome extension. Get notified on events you consider important (server resources CPU, RAM, Disk reached limit, new user signup, etc). 
 Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/badger/) to output maximum performance.
@@ -55,7 +55,7 @@ Response (status code: `200` or `500`):
 
 ## Save event
 
-From your web app send this POST request to `Simple server monitor`.
+From your web app send this POST request to `Is My Server Ok`.
 
 ```shell
 curl  -X POST \

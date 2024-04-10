@@ -34,7 +34,7 @@
             margin-top: 2rem;
         }
     </style>
-    <title>Simple server monitor</title>
+    <title>Is My Server Ok</title>
 </head>
 
 <body>
@@ -42,7 +42,7 @@
     <main class="container">
 
         <hgroup style="display: flex; flex-direction: column; align-items: center; margin-top: 2rem;">
-            <h1>Simple server monitor</h1>
+            <h1>Is My Server Ok?</h1>
             <p>
                 View important events on your servers.
                 Events like: bugs, important user actions, critical server resources reached.
@@ -102,9 +102,12 @@
             </article>
         </dialog>
 
-        <a id="open-settings" class="tag" href="#">🔧 View Settings</a>
-        <a id="clear-events" class="tag" href="#">🧹 Clear events</a>
-        <a id="clear-database" class="tag" href="#">💥 Nuke all data</a>
+        <div style="margin-top: 4rem;">
+            <a id="open-settings" class="tag" href="#">🔧 View Settings</a>
+            <a id="pause-notifications" class="tag" href="#">🔔 Pause notifications</a>
+            <a id="clear-events" class="tag" href="#">🧹 Clear events</a>
+            <a id="clear-database" class="tag" href="#">💥 Nuke all data</a>
+        </div>
 
         <div id="events">
             <p style="margin-top: 4rem;">Latest events from your server(s):</p>

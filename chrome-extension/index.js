@@ -9,6 +9,7 @@ const settingsModalElem = document.getElementById("settings-modal")
 const settingsContainer = document.getElementById("settings-container")
 const eventsContainer = document.getElementById("events-container")
 const clearEventsElem = document.getElementById("clear-events")
+const pauseNotificationsElem = document.getElementById("pause-notifications")
 
 
 async function init() {
@@ -18,6 +19,24 @@ async function init() {
 }
 
 document.addEventListener("DOMContentLoaded", init)
+
+
+pauseNotificationsElem.addEventListener("click", async function (event) {
+    event.preventDefault()
+
+    chrome.storage.sync.get(['alarmsPaused'], async function (items) {
+        items.alarmsPaused = items.alarmsPaused ? false : true
+        chrome.storage.sync.set({ 'alarmsPaused': items.alarmsPaused })
+
+        if (items.alarmsPaused) {
+            pauseNotificationsElem.innerText = "🔕 Notifications paused"
+        } else {
+            pauseNotificationsElem.innerText = "🔔 Pause notifications"
+        }
+
+    })
+
+})
 
 
 clearEventsElem.addEventListener("click", async function (event) {
