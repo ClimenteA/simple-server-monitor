@@ -17,7 +17,6 @@
         "notifications",
         "storage",
         "unlimitedStorage",
-        "scripting",
         "offscreen"
     ],
     "action": {

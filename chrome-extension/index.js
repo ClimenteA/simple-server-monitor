@@ -21,8 +21,41 @@ async function init() {
 document.addEventListener("DOMContentLoaded", init)
 
 
+async function showNotification(alarmName) {
+
+    try {
+        await chrome.offscreen.createDocument({
+            url: chrome.runtime.getURL('static/audio.html'),
+            reasons: ['AUDIO_PLAYBACK'],
+            justification: 'notification',
+        })
+    } catch (error) {
+        console.error(error)
+    }
+
+    let iconPath = "static/notification.jpg"
+    let message = "🔥🔥🔥 Server not responding! 🔥🔥🔥"
+    if (alarmName == "Server down") {
+        iconPath = "static/fire.jpg"
+    }
+
+    await chrome.notifications.create(alarmName, {
+        type: "basic",
+        title: alarmName,
+        message: message,
+        iconUrl: chrome.runtime.getURL(iconPath)
+    })
+
+}
+
+
 chrome.storage.onChanged.addListener(async function (changes, areaName) {
     if (changes.events && areaName == "local") {
+
+        if (Object.values(changes.events.newValue)[0].EventId.startsWith("server-error")) {
+            await showNotification("Server down")
+        }
+
         createEventsTable()
     }
 })
@@ -119,6 +152,25 @@ function createEventsTable() {
 
 async function setEvents() {
 
+    function getServerDownEvent(data) {
+
+        const now = new Date()
+        const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)
+
+        const receivedEvent = {
+            EventId: "server-error-" + timestamp,
+            Title: "Server down",
+            Message: "Failed to fetch data from url: " + data.url,
+            Level: "critical",
+            Origin: data,
+            Timestamp: timestamp
+        }
+
+        return receivedEvent
+    }
+
+
+
     chrome.storage.sync.get(['settings'], function (settingsItems) {
         if (!settingsItems.settings) return
 
@@ -140,35 +192,35 @@ async function setEvents() {
                         headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
                     })
 
-                    receviedEvents = await response.json()
+                    if (response.status == 200) {
+                        receviedEvents = await response.json()
 
-                    for (const receivedEvent of receviedEvents.data || []) {
-                        receivedEvent.Origin = data
+                        for (const receivedEvent of receviedEvents.data || []) {
+                            receivedEvent.Origin = data
+                            events[receivedEvent.EventId] = receivedEvent
+                        }
+                    } else {
+                        const receivedEvent = getServerDownEvent(data)
                         events[receivedEvent.EventId] = receivedEvent
                     }
 
+                    chrome.storage.local.set({ 'events': events })
+
                 } catch (error) {
-                    console.error(error)
+                    console.error("server is not responding: ", error)
 
-                    const now = new Date()
-                    const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)
-
-                    const receivedEvent = {
-                        EventId: "server-error-" + timestamp,
-                        Title: "Server down",
-                        Message: "Failed to fetch data from url: " + data.url,
-                        Level: "critical",
-                        Origin: data,
-                        Timestamp: timestamp
-                    }
-
+                    const receivedEvent = getServerDownEvent(data)
                     events[receivedEvent.EventId] = receivedEvent
+
+                    console.log(events)
+
+                    chrome.storage.local.set({ 'events': events })
+
+                    await chrome.runtime.sendMessage({ msg: "showNotification" })
 
                 }
 
             }
-
-            chrome.storage.local.set({ 'events': events })
 
         })
 

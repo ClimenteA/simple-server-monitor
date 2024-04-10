@@ -50,19 +50,6 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
                     events[receivedEvent.EventId] = receivedEvent
                 }
 
-                await chrome.offscreen.createDocument({
-                    url: chrome.runtime.getURL('static/audio.html'),
-                    reasons: ['AUDIO_PLAYBACK'],
-                    justification: 'notification',
-                })
-
-                await chrome.notifications.create(alarm.name, {
-                    type: "basic",
-                    title: alarm.name,
-                    message: "You got some new important events.",
-                    iconUrl: chrome.runtime.getURL("static/notification.jpg")
-                })
-
                 chrome.storage.local.set({ 'events': events })
 
             })
