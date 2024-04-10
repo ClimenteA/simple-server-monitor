@@ -11,14 +11,34 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
 
             const data = items.settings[alarm.name]
 
-            const response = await fetch(data.url, {
-                method: "GET",
-                headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
-            })
+            let receviedEvents
 
-            if (response.status != 200) return
-            const receviedEvents = await response.json()
-            if (!receviedEvents.data) return
+            try {
+                const response = await fetch(data.url, {
+                    method: "GET",
+                    headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
+                })
+
+                if (response.status != 200) return
+                receviedEvents = await response.json()
+                if (!receviedEvents.data) return
+
+            } catch (error) {
+                console.error(error)
+
+                const now = new Date()
+                const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)
+
+                receviedEvents = {
+                    data: [{
+                        EventId: "server-error-" + timestamp,
+                        Title: "Server down",
+                        Message: "Failed to fetch data from url: " + data.url,
+                        Level: "critical",
+                        Timestamp: timestamp
+                    }]
+                }
+            }
 
             chrome.storage.local.get(['events'], async function (items) {
 
@@ -44,8 +64,6 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
                 })
 
                 chrome.storage.local.set({ 'events': events })
-
-                
 
             })
         })

@@ -68,14 +68,20 @@ nukeAllElem.addEventListener("click", async function (event) {
 
             if (data.apiKey.length == 0) continue
 
-            const response = await fetch(data.url + "clear-database", {
-                method: "DELETE",
-                headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
-            })
+            try {
 
-            if (response.status != 200) {
-                console.log(response)
-                alert(`Could not delete data for ${data.url}`)
+                const response = await fetch(data.url + "clear-database", {
+                    method: "DELETE",
+                    headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
+                })
+
+                if (response.status != 200) {
+                    console.log(response)
+                    alert(`Could not delete data for ${data.url}`)
+                }
+
+            } catch (error) {
+                alert(`Could not delete data for ${error}`)
             }
         }
     })
@@ -125,22 +131,39 @@ async function setEvents() {
 
                 if (data.apiKey.length == 0) continue
 
-                const response = await fetch(data.url, {
-                    method: "GET",
-                    headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
-                })
+                let receviedEvents
 
-                if (response.status == 200) {
+                try {
 
-                    const receviedEvents = await response.json()
+                    const response = await fetch(data.url, {
+                        method: "GET",
+                        headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
+                    })
+
+                    receviedEvents = await response.json()
 
                     for (const receivedEvent of receviedEvents.data || []) {
                         receivedEvent.Origin = data
                         events[receivedEvent.EventId] = receivedEvent
                     }
-                } else {
-                    console.log(data)
-                    alert("Could not get events")
+
+                } catch (error) {
+                    console.error(error)
+
+                    const now = new Date()
+                    const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)
+
+                    const receivedEvent = {
+                        EventId: "server-error-" + timestamp,
+                        Title: "Server down",
+                        Message: "Failed to fetch data from url: " + data.url,
+                        Level: "critical",
+                        Origin: data,
+                        Timestamp: timestamp
+                    }
+
+                    events[receivedEvent.EventId] = receivedEvent
+
                 }
 
             }
@@ -239,28 +262,13 @@ function appendEventsRow(data) {
 
     deleteCell.addEventListener("click", async () => {
 
-        console.log("Deleting:", data)
-
-        const response = await fetch(data.Origin.url + `delete/${data.EventId}`, {
-            method: "DELETE",
-            headers: { "Content-Type": "application/json", "ApiKey": data.Origin.apiKey }
+        chrome.storage.local.get(['events'], async function (items) {
+            if (!items.events) return
+            delete items.events[data.EventId]
+            chrome.storage.local.set({ 'events': items.events })
         })
 
-        if (response.status == 200) {
-
-            chrome.storage.local.get(['events'], async function (items) {
-                if (!items.events) return
-                delete items.events[data.EventId]
-                chrome.storage.local.set({ 'events': items.events })
-            })
-
-            row.remove()
-
-        } else {
-            console.log(data)
-            alert("Could not delete row")
-        }
-
+        row.remove()
     })
 
     row.appendChild(deleteCell)
