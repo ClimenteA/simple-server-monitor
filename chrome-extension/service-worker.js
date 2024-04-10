@@ -45,6 +45,8 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
 
                 chrome.storage.local.set({ 'events': events })
 
+                
+
             })
         })
     })

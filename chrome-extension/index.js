@@ -21,6 +21,13 @@ async function init() {
 document.addEventListener("DOMContentLoaded", init)
 
 
+chrome.storage.onChanged.addListener(async function (changes, areaName) {
+    if (changes.events && areaName == "local") {
+        createEventsTable()
+    }
+})
+
+
 pauseNotificationsElem.addEventListener("click", async function (event) {
     event.preventDefault()
 
@@ -51,9 +58,8 @@ nukeAllElem.addEventListener("click", async function (event) {
     nukeAllElem.innerText = "💥 Boom.."
 
     await chrome.alarms.clearAll()
-    chrome.storage.sync.set({ 'settings': null })
-    chrome.storage.sync.set({ 'alarmsPaused': null })
-    chrome.storage.local.set({ 'events': null })
+    chrome.storage.sync.clear()
+    chrome.storage.local.clear()
 
     chrome.storage.sync.get(['settings'], async function (items) {
         if (!items.settings) return
