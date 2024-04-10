@@ -252,12 +252,19 @@ function convertUtcToLocaleTimeString(utcIsoFormatString) {
     return localTime
 }
 
+
+const levelEmojiMapper = {
+    "info": "📜",
+    "warning": "⚠️",
+    "critical": "🔥",
+}
+
 function appendEventsRow(data) {
 
     const row = document.createElement("tr")
 
     const levelCell = document.createElement("td")
-    levelCell.innerText = data.Level
+    levelCell.innerText = levelEmojiMapper[data.Level] || "📜"
     row.appendChild(levelCell)
 
     const titleCell = document.createElement("td")

@@ -1,15 +1,15 @@
 # Is My Server Ok
 
 Monitor your web apps with a simple chrome extension. Get notified on events you consider important (server resources CPU, RAM, Disk reached limit, new user signup, etc). 
-Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/badger/) to output maximum performance.
+Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/badger/) to output maximum performance.  
 
 
 ## Quickstart
 
 - Clone the repo;
-- Go in your chromium based browser to Settings > Manage Extensions > Load unpacked and point to `chrome-extension folder`;
+- Go in your chromium based browser to Settings > Manage Extensions > Load unpacked and point to `chrome-extension folder` (you can stop here if you just want to know if your website is down or not);
 - Run `make build` to create the binary which will run on the server (or use the Binary or Dockerfile provided);
-- Create an APIKEY with: `openssl rand -hex 16`
+- Create an APIKEY with: `openssl rand -hex 16`;
 - Place binary on your server;
 - Expected `.env` file next to binary:
 
@@ -22,10 +22,34 @@ DISK_MAX_USAGE=90
 USAGE_INTERVAL_CHECK=5
 ```
 
+**Browser extension main page:**
+![](/pics/ismyserverok.png)
+
+
+The UI is pretty simple with the following options:
+- View Settings: view settings modal where you can add 1 or more servers to monitor;
+- Pause notifications: you can turn off notifications (notifications are with sound);
+- Clear events: delete all events saved in the browser's storage;
+- Nuke all data: delete all events, settings, notifications as you would've just installed the chrome extension;
+- Events table: all events displayed row by row (you can delete events one by one or use Clear events to delete all events);
+
+**View settings modal:**
+![](/pics/settings.png)
+
+The View settings modal has 3 fields:
+- Url: paste the base url of the Go api or your implementation;
+- ApiKey: paste the ApiKey saved on the server's .env file;
+- Request Interval (Minutes): at what interval in minutes should the chrome extension fetch events from the server;
+- Settings table: you can delete settings one by one by clicking 'Delete' or you can edit one row by clickin 'Edit' and then clicking 'Save settings' button to save.
+
+
+# RestAPI
+
+You can choose to use the Go binary setup or just recreate these routes in the webframework and programming language of your choice. 
 
 ## Get events
 
-Get all events saved in the Badger database.
+Get all events saved in the Badger database. The events are deleted after they are sent because they will be saved in the chrome extension. 
 
 Request (status code: `200` or `500`)::
 
