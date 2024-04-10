@@ -13,6 +13,7 @@ const pauseNotificationsElem = document.getElementById("pause-notifications")
 
 
 async function init() {
+    setAlarmState()
     await setEvents()
     createEventsTable()
     createSettingsTable()
@@ -27,21 +28,28 @@ chrome.storage.onChanged.addListener(async function (changes, areaName) {
     }
 })
 
-pauseNotificationsElem.addEventListener("click", async function (event) {
-    event.preventDefault()
+function setAlarmState(newState = null) {
 
     chrome.storage.sync.get(['alarmsPaused'], async function (items) {
-        items.alarmsPaused = items.alarmsPaused ? false : true
-        chrome.storage.sync.set({ 'alarmsPaused': items.alarmsPaused })
 
-        if (items.alarmsPaused) {
+        if (newState != null) {
+            items.alarmsPaused = items.alarmsPaused ? false : true
+            chrome.storage.sync.set({ 'alarmsPaused': items.alarmsPaused })
+        }
+
+        if (items.alarmsPaused == true) {
             pauseNotificationsElem.innerText = "🔕 Notifications paused"
-        } else {
+        } else if (items.alarmsPaused == false) {
             pauseNotificationsElem.innerText = "🔔 Pause notifications"
         }
 
     })
 
+}
+
+pauseNotificationsElem.addEventListener("click", async function (event) {
+    event.preventDefault()
+    setAlarmState(true)
 })
 
 
