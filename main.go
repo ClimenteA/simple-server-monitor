@@ -99,5 +99,5 @@ func main() {
 		return c.JSON(map[string]string{"message": "database cleared"})
 	})
 
-	app.Listen(":" + os.Getenv("PORT"))
+	app.Listen(":" + os.Getenv("SIMPLE_SERVER_MONITOR_PORT"))
 }

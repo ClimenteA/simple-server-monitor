@@ -14,12 +14,12 @@ Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/
 - Expected `.env` file next to binary:
 
 ```shell
-PORT=3000
-APIKEY=bdeef21a30cc0af802ac634ab2127817
-CPU_MAX_USAGE=90
-RAM_MAX_USAGE=90
-DISK_MAX_USAGE=90
-USAGE_INTERVAL_CHECK=5
+SIMPLE_SERVER_MONITOR_PORT=4235
+SIMPLE_SERVER_MONITOR_APIKEY=bdeef21a30cc0af802ac634ab2127817
+SIMPLE_SERVER_MONITOR_CPU_MAX_USAGE=90
+SIMPLE_SERVER_MONITOR_RAM_MAX_USAGE=90
+SIMPLE_SERVER_MONITOR_DISK_MAX_USAGE=90
+SIMPLE_SERVER_MONITOR_USAGE_INTERVAL_CHECK=5
 ```
 
 **Browser extension main page:**
@@ -41,6 +41,9 @@ The View settings modal has 3 fields:
 - ApiKey: paste the ApiKey saved on the server's .env file;
 - Request Interval (Minutes): at what interval in minutes should the chrome extension fetch events from the server;
 - Settings table: you can delete settings one by one by clicking 'Delete' or you can edit one row by clicking 'Edit' and then clicking 'Save settings' button to save.
+
+
+
 
 
 # RestAPI

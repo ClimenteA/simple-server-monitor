@@ -31,22 +31,22 @@ func getServerUsage() ServerUsage {
 		USAGE_INTERVAL_CHECK: 60,
 	}
 
-	cpuMaxUsage, err := parseFloat(os.Getenv("CPU_MAX_USAGE"))
+	cpuMaxUsage, err := parseFloat(os.Getenv("SIMPLE_SERVER_MONITOR_CPU_MAX_USAGE"))
 	if err == nil {
 		serverUsage.CPU_MAX_USAGE = cpuMaxUsage
 	}
 
-	ramMaxUsage, err := parseFloat(os.Getenv("RAM_MAX_USAGE"))
+	ramMaxUsage, err := parseFloat(os.Getenv("SIMPLE_SERVER_MONITOR_RAM_MAX_USAGE"))
 	if err == nil {
 		serverUsage.RAM_MAX_USAGE = ramMaxUsage
 	}
 
-	diskMaxUsage, err := parseFloat(os.Getenv("DISK_MAX_USAGE"))
+	diskMaxUsage, err := parseFloat(os.Getenv("SIMPLE_SERVER_MONITOR_DISK_MAX_USAGE"))
 	if err == nil {
 		serverUsage.DISK_MAX_USAGE = diskMaxUsage
 	}
 
-	usageIntervalCheck, err := strconv.Atoi(os.Getenv("USAGE_INTERVAL_CHECK"))
+	usageIntervalCheck, err := strconv.Atoi(os.Getenv("SIMPLE_SERVER_MONITOR_USAGE_INTERVAL_CHECK"))
 	if err == nil {
 		serverUsage.USAGE_INTERVAL_CHECK = usageIntervalCheck
 	}
