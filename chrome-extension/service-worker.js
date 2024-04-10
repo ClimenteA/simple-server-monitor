@@ -85,13 +85,20 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
 
                 if (!items.events) items.events = {}
 
-                let events = items.events
                 for (const receivedEvent of receviedEvents.data) {
                     receivedEvent.Origin = data
-                    events[receivedEvent.EventId] = receivedEvent
                 }
 
-                chrome.storage.local.set({ 'events': events })
+                let events = [...Object.values(items.events), ...receviedEvents.data]
+
+                const newEvents = {}
+                for (const event of events) {
+                    newEvents[event.EventId] = event
+                }
+
+                console.log("Events in service worker:", newEvents)
+
+                chrome.storage.local.set({ 'events': newEvents })
 
             })
         })

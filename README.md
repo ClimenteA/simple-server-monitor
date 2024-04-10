@@ -40,7 +40,7 @@ The View settings modal has 3 fields:
 - Url: paste the base url of the Go api or your implementation;
 - ApiKey: paste the ApiKey saved on the server's .env file;
 - Request Interval (Minutes): at what interval in minutes should the chrome extension fetch events from the server;
-- Settings table: you can delete settings one by one by clicking 'Delete' or you can edit one row by clickin 'Edit' and then clicking 'Save settings' button to save.
+- Settings table: you can delete settings one by one by clicking 'Delete' or you can edit one row by clicking 'Edit' and then clicking 'Save settings' button to save.
 
 
 # RestAPI

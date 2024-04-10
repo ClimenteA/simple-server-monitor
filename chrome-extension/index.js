@@ -178,19 +178,24 @@ async function setEvents() {
                         events[receivedEvent.EventId] = receivedEvent
                     }
 
-                    chrome.storage.local.set({ 'events': events })
-
                 } catch (error) {
                     console.error("server is not responding: ", error)
 
                     const receivedEvent = getServerDownEvent(data)
                     events[receivedEvent.EventId] = receivedEvent
 
-                    chrome.storage.local.set({ 'events': events })
-
                 }
 
             }
+
+            const newEvents = {}
+            for (const event of Object.values(events)) {
+                events[event.EventId] = event
+            }
+
+            console.log("Events in index.js", newEvents)
+
+            chrome.storage.local.set({ 'events': newEvents })
 
         })
 
@@ -261,6 +266,10 @@ const levelEmojiMapper = {
 
 function appendEventsRow(data) {
 
+    if (document.querySelector(`[data-event-id="${data.EventId}"]`)) {
+        return
+    }
+
     const row = document.createElement("tr")
 
     const levelCell = document.createElement("td")
@@ -269,6 +278,7 @@ function appendEventsRow(data) {
 
     const titleCell = document.createElement("td")
     titleCell.innerText = data.Title
+    titleCell.setAttribute("data-event-id", data.EventId)
     row.appendChild(titleCell)
 
     const messageCell = document.createElement("td")
