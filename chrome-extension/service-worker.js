@@ -30,7 +30,7 @@ async function showNotification(alarmName) {
 
 chrome.storage.onChanged.addListener(async function (changes, areaName) {
     if (changes.events && areaName == "local") {
-        const event = Object.values(changes.events.newValue)[0]
+        const event = Object.values(changes.events?.newValue)[0]
         if (!event) return
         if (event.EventId.startsWith("server-error")) {
             await showNotification("Server down")

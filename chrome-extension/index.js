@@ -190,7 +190,7 @@ async function setEvents() {
 
             const newEvents = {}
             for (const event of Object.values(events)) {
-                events[event.EventId] = event
+                newEvents[event.EventId] = event
             }
 
             console.log("Events in index.js", newEvents)
