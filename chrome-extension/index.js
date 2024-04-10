@@ -21,45 +21,11 @@ async function init() {
 document.addEventListener("DOMContentLoaded", init)
 
 
-async function showNotification(alarmName) {
-
-    try {
-        await chrome.offscreen.createDocument({
-            url: chrome.runtime.getURL('static/audio.html'),
-            reasons: ['AUDIO_PLAYBACK'],
-            justification: 'notification',
-        })
-    } catch (error) {
-        console.error(error)
-    }
-
-    let iconPath = "static/notification.jpg"
-    let message = "🔥🔥🔥 Server not responding! 🔥🔥🔥"
-    if (alarmName == "Server down") {
-        iconPath = "static/fire.jpg"
-    }
-
-    await chrome.notifications.create(alarmName, {
-        type: "basic",
-        title: alarmName,
-        message: message,
-        iconUrl: chrome.runtime.getURL(iconPath)
-    })
-
-}
-
-
 chrome.storage.onChanged.addListener(async function (changes, areaName) {
     if (changes.events && areaName == "local") {
-
-        if (Object.values(changes.events.newValue)[0].EventId.startsWith("server-error")) {
-            await showNotification("Server down")
-        }
-
         createEventsTable()
     }
 })
-
 
 pauseNotificationsElem.addEventListener("click", async function (event) {
     event.preventDefault()
@@ -212,11 +178,7 @@ async function setEvents() {
                     const receivedEvent = getServerDownEvent(data)
                     events[receivedEvent.EventId] = receivedEvent
 
-                    console.log(events)
-
                     chrome.storage.local.set({ 'events': events })
-
-                    await chrome.runtime.sendMessage({ msg: "showNotification" })
 
                 }
 

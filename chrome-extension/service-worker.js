@@ -1,4 +1,45 @@
 
+async function showNotification(alarmName) {
+
+    try {
+        await chrome.offscreen.createDocument({
+            url: chrome.runtime.getURL('static/audio.html'),
+            reasons: ['AUDIO_PLAYBACK'],
+            justification: 'notification',
+        })
+    } catch (error) {
+        console.error("cannot play audio ", error)
+    }
+
+    let iconPath = "static/notification.jpg"
+    let message = "You got some new server notifications!"
+    if (alarmName == "Server down") {
+        iconPath = "static/fire.jpg"
+        message = "🔥🔥🔥 Server not responding! 🔥🔥🔥"
+    }
+
+    await chrome.notifications.create(alarmName, {
+        type: "basic",
+        title: alarmName,
+        message: message,
+        iconUrl: chrome.runtime.getURL(iconPath)
+    })
+
+}
+
+
+chrome.storage.onChanged.addListener(async function (changes, areaName) {
+    if (changes.events && areaName == "local") {
+        const event = Object.values(changes.events.newValue)[0]
+        if (!event) return
+        if (event.EventId.startsWith("server-error")) {
+            await showNotification("Server down")
+        } else {
+            await showNotification(event.Origin.url)
+        }
+    }
+})
+
 
 chrome.alarms.onAlarm.addListener(async function (alarm) {
 
@@ -24,7 +65,7 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
                 if (!receviedEvents.data) return
 
             } catch (error) {
-                console.error(error)
+                console.error("cannot fetch notifications", error)
 
                 const now = new Date()
                 const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)
