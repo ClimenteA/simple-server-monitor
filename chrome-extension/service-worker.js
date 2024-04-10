@@ -3,7 +3,8 @@
 chrome.alarms.onAlarm.addListener(async function (alarm) {
 
     chrome.storage.sync.get(['alarmsPaused'], async function (items) {
-        if (items.alarmsPaused) return
+
+        if (items.alarmsPaused == true) return
 
         chrome.storage.sync.get(['settings'], async function (items) {
             if (!items.settings) return

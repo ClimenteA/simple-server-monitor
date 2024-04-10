@@ -2,7 +2,7 @@ const settingsForm = document.getElementById("settings-form")
 const urlElem = document.querySelector('[name="url"]')
 const requestIntervalElem = document.querySelector('[name="requestInterval"]')
 const apiKeyElem = document.querySelector('[name="apiKey"]')
-const clearDBElem = document.getElementById("clear-database")
+const nukeAllElem = document.getElementById("clear-database")
 const settingsOpenElem = document.getElementById("open-settings")
 const settingsCloseElem = document.getElementById("close-settings")
 const settingsModalElem = document.getElementById("settings-modal")
@@ -45,11 +45,14 @@ clearEventsElem.addEventListener("click", async function (event) {
     location.reload()
 })
 
-clearDBElem.addEventListener("click", async function (event) {
+nukeAllElem.addEventListener("click", async function (event) {
     event.preventDefault()
+
+    nukeAllElem.innerText = "💥 Boom.."
 
     await chrome.alarms.clearAll()
     chrome.storage.sync.set({ 'settings': null })
+    chrome.storage.sync.set({ 'alarmsPaused': null })
     chrome.storage.local.set({ 'events': null })
 
     chrome.storage.sync.get(['settings'], async function (items) {
@@ -70,6 +73,8 @@ clearDBElem.addEventListener("click", async function (event) {
             }
         }
     })
+
+    nukeAllElem.innerText = "💥 Done!"
 
     location.reload()
 })
