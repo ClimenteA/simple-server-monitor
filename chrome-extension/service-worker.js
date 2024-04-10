@@ -8,7 +8,7 @@ async function showNotification(alarmName) {
             justification: 'notification',
         })
     } catch (error) {
-        console.error("cannot play audio ", error)
+        console.info("cannot play audio ", error)
     }
 
     let iconPath = "static/notification.jpg"
@@ -65,7 +65,7 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
                 if (!receviedEvents.data) return
 
             } catch (error) {
-                console.error("cannot fetch notifications", error)
+                console.info("cannot fetch notifications", error)
 
                 const now = new Date()
                 const timestamp = now.toISOString().replace(/[-:T]/g, '').slice(0, 14)

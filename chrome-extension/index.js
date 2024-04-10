@@ -179,7 +179,7 @@ async function setEvents() {
                     }
 
                 } catch (error) {
-                    console.error("server is not responding: ", error)
+                    console.info("server is not responding: ", error)
 
                     const receivedEvent = getServerDownEvent(data)
                     events[receivedEvent.EventId] = receivedEvent
