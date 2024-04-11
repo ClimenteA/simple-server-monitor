@@ -118,6 +118,7 @@ func MonitorServer() {
 		err := getIsHealthyResponse(serverUsage.HEALTH_URL)
 		if err != nil {
 			Set("error-server-health-url::"+utcIsoNow, err.Error())
+			log.Println(err.Error())
 			sleep(serverUsage.USAGE_INTERVAL_CHECK)
 			continue
 		}
@@ -126,6 +127,7 @@ func MonitorServer() {
 		if err != nil {
 			log.Println("Error executing the command:", err)
 			Set("error-server-usage-cpu::"+utcIsoNow, "failed to get cpu usage")
+			log.Println(err.Error())
 			sleep(serverUsage.USAGE_INTERVAL_CHECK)
 			continue
 		}
@@ -134,6 +136,7 @@ func MonitorServer() {
 		if err != nil {
 			log.Println("Error executing the command:", err)
 			Set("error-server-usage-ram::"+utcIsoNow, "failed to get ram usage")
+			log.Println(err.Error())
 			sleep(serverUsage.USAGE_INTERVAL_CHECK)
 			continue
 		}
@@ -142,6 +145,7 @@ func MonitorServer() {
 		if err != nil {
 			log.Println("Error executing the command:", err)
 			Set("error-server-usage-disk::"+utcIsoNow, "failed to get disk usage")
+			log.Println(err.Error())
 			sleep(serverUsage.USAGE_INTERVAL_CHECK)
 			continue
 		}
@@ -149,18 +153,21 @@ func MonitorServer() {
 		if cpuUsage >= serverUsage.CPU_MAX_USAGE || ramUsage >= serverUsage.RAM_MAX_USAGE || diskUsage >= serverUsage.DISK_MAX_USAGE {
 
 			eventId := uuid.NewString()
+			message := fmt.Sprintf("Server resources have reached critical levels. CPU: %.3f%%, RAM: %.3f%%, DISK: %.3f%%", cpuUsage, ramUsage, diskUsage)
+
+			log.Println(message)
 
 			event := ServerEvent{
 				EventId:   eventId,
 				Title:     "Server resources",
-				Message:   fmt.Sprintf("Server resources have reached critical levels. CPU: %.3f%%, RAM: %.3f%%, DISK: %.3f%%", cpuUsage, ramUsage, diskUsage),
+				Message:   message,
 				Level:     "warning",
 				Timestamp: utcIsoNow,
 			}
 
 			currentEventJSON, err := json.Marshal(event)
 			if err != nil {
-				log.Println("Error:", err)
+				log.Println(err.Error())
 				Set("error-event-marshal::"+utcIsoNow, "failed to convert struct to json on MonitorServerUsage")
 				return
 			}
@@ -169,6 +176,7 @@ func MonitorServer() {
 
 		}
 
+		log.Println("server %s looks ok", serverUsage.HEALTH_URL)
 		sleep(serverUsage.USAGE_INTERVAL_CHECK)
 	}
 
