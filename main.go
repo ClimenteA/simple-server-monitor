@@ -14,15 +14,10 @@ import (
 
 	"github.com/ClimenteA/simple-server-monitor/handlers"
 
-	"github.com/joho/godotenv"
+	_ "github.com/joho/godotenv/autoload"
 )
 
 func main() {
-
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
-	}
 
 	go handlers.MonitorServer()
 
@@ -99,5 +94,8 @@ func main() {
 		return c.JSON(map[string]string{"message": "database cleared"})
 	})
 
-	app.Listen(":" + os.Getenv("SIMPLE_SERVER_MONITOR_PORT"))
+	err := app.Listen(":" + os.Getenv("SIMPLE_SERVER_MONITOR_PORT"))
+	if err != nil {
+		log.Fatal(err.Error())
+	}
 }

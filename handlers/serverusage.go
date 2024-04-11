@@ -35,26 +35,36 @@ func getServerUsage() ServerUsage {
 	healthUrl := os.Getenv("SIMPLE_SERVER_MONITOR_HEALTH_URL")
 	if strings.HasPrefix(healthUrl, "http") {
 		serverUsage.HEALTH_URL = healthUrl
+	} else {
+		log.Fatal("please provide SIMPLE_SERVER_MONITOR_HEALTH_URL in .env file")
 	}
 
 	cpuMaxUsage, err := parseFloat(os.Getenv("SIMPLE_SERVER_MONITOR_CPU_MAX_USAGE"))
 	if err == nil {
 		serverUsage.CPU_MAX_USAGE = cpuMaxUsage
+	} else {
+		log.Fatal("SIMPLE_SERVER_MONITOR_CPU_MAX_USAGE missing")
 	}
 
 	ramMaxUsage, err := parseFloat(os.Getenv("SIMPLE_SERVER_MONITOR_RAM_MAX_USAGE"))
 	if err == nil {
 		serverUsage.RAM_MAX_USAGE = ramMaxUsage
+	} else {
+		log.Fatal("SIMPLE_SERVER_MONITOR_RAM_MAX_USAGE missing")
 	}
 
 	diskMaxUsage, err := parseFloat(os.Getenv("SIMPLE_SERVER_MONITOR_DISK_MAX_USAGE"))
 	if err == nil {
 		serverUsage.DISK_MAX_USAGE = diskMaxUsage
+	} else {
+		log.Fatal("SIMPLE_SERVER_MONITOR_DISK_MAX_USAGE missing")
 	}
 
 	usageIntervalCheck, err := strconv.Atoi(os.Getenv("SIMPLE_SERVER_MONITOR_USAGE_INTERVAL_CHECK"))
 	if err == nil {
 		serverUsage.USAGE_INTERVAL_CHECK = usageIntervalCheck
+	} else {
+		log.Fatal("SIMPLE_SERVER_MONITOR_USAGE_INTERVAL_CHECK missing")
 	}
 
 	return serverUsage
@@ -89,15 +99,20 @@ func getDiskUsage() (float64, error) {
 
 func getIsHealthyResponse(healthUrl string) error {
 
+	log.Println("Checking ", healthUrl)
 	resp, err := http.Get(healthUrl)
 	if err != nil {
+		log.Println("Got an error ", err.Error())
 		return err
 	}
 	defer resp.Body.Close()
 
 	if resp.StatusCode != 200 {
+		log.Println("Status code not 200!")
 		return fmt.Errorf("%s responded with a %d status code instead of 200", healthUrl, resp.StatusCode)
 	}
+
+	log.Println("Looks good ", healthUrl, resp)
 
 	return nil
 
@@ -109,6 +124,8 @@ func sleep(waitValue int) {
 
 func MonitorServer() {
 	serverUsage := getServerUsage()
+
+	log.Println("got server usage values: ", serverUsage)
 
 	for {
 
@@ -169,14 +186,14 @@ func MonitorServer() {
 			if err != nil {
 				log.Println(err.Error())
 				Set("error-event-marshal::"+utcIsoNow, "failed to convert struct to json on MonitorServerUsage")
-				return
+				continue
 			}
 
 			Set("event::"+eventId, string(currentEventJSON))
 
 		}
 
-		log.Println("server %s looks ok", serverUsage.HEALTH_URL)
+		log.Printf("server %s looks ok", serverUsage.HEALTH_URL)
 		sleep(serverUsage.USAGE_INTERVAL_CHECK)
 	}
 
