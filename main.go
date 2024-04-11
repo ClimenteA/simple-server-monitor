@@ -24,7 +24,7 @@ func main() {
 		log.Fatal("Error loading .env file")
 	}
 
-	go handlers.MonitorServerUsage()
+	go handlers.MonitorServer()
 
 	defer handlers.BadgerDB.Close()
 

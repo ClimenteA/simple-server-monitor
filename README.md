@@ -1,5 +1,7 @@
 # Is My Server Ok
 
+# Work in progress..
+
 Monitor your web apps with a simple chrome extension. Get notified on events you consider important (server resources CPU, RAM, Disk reached limit, new user signup, etc). 
 Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/badger/) to output maximum performance.  
 
@@ -14,12 +16,13 @@ Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/
 - Expected `.env` file next to binary:
 
 ```shell
-SIMPLE_SERVER_MONITOR_PORT=4235
+SIMPLE_SERVER_MONITOR_PORT=4325
 SIMPLE_SERVER_MONITOR_APIKEY=bdeef21a30cc0af802ac634ab2127817
 SIMPLE_SERVER_MONITOR_CPU_MAX_USAGE=90
 SIMPLE_SERVER_MONITOR_RAM_MAX_USAGE=90
 SIMPLE_SERVER_MONITOR_DISK_MAX_USAGE=90
 SIMPLE_SERVER_MONITOR_USAGE_INTERVAL_CHECK=5
+SIMPLE_SERVER_MONITOR_USAGE_HEALTH_URL=http://localhost:3000/health
 ```
 
 **Browser extension main page:**

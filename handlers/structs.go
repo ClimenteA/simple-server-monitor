@@ -9,6 +9,7 @@ type ServerEvent struct {
 }
 
 type ServerUsage struct {
+	HEALTH_URL           string
 	CPU_MAX_USAGE        float64
 	RAM_MAX_USAGE        float64
 	DISK_MAX_USAGE       float64
