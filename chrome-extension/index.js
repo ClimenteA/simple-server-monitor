@@ -220,6 +220,10 @@ settingsForm.addEventListener("submit", async function (event) {
         return
     }
 
+    if (data.url.endsWith("/")) {
+        data.url = data.url.slice(0, data.url.length - 1)
+    }
+
     chrome.storage.sync.get(['settings'], function (items) {
         if (!items.settings) items.settings = {}
         items.settings[data.url] = data
