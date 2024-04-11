@@ -80,8 +80,8 @@ func getCpuUsage() (float64, error) {
 }
 
 func getRamUsage() (float64, error) {
-	// free -h | awk '/^Mem:/ {print ($3/$2)*100"%"}'
-	usagePercent, err := exec.Command("bash", "-c", "free -h | awk '/^Mem:/ {print ($3/$2)*100\"%\"}'").Output()
+	// free | grep Mem | awk '{printf("%.1f%%\n", $3/$2 * 100.0)}'
+	usagePercent, err := exec.Command("bash", "-c", `free | grep Mem | awk '{printf("%.1f%%\n", $3/$2 * 100.0)}'`).Output()
 	if err != nil {
 		return 0, err
 	}
