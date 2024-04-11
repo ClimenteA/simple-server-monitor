@@ -77,7 +77,7 @@ nukeAllElem.addEventListener("click", async function (event) {
 
             try {
 
-                const response = await fetch(data.url + "clear-database", {
+                const response = await fetch(data.url + "/simple-server-monitor/clear-database", {
                     method: "DELETE",
                     headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
                 })
@@ -161,7 +161,7 @@ async function setEvents() {
 
                 try {
 
-                    const response = await fetch(data.url + "/notifications", {
+                    const response = await fetch(data.url + "/simple-server-monitor/notifications", {
                         method: "GET",
                         headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
                     })
