@@ -99,7 +99,6 @@ func getDiskUsage() (float64, error) {
 
 func getIsHealthyResponse(healthUrl string) error {
 
-	log.Println("Checking ", healthUrl)
 	resp, err := http.Get(healthUrl)
 	if err != nil {
 		log.Println("Got an error ", err.Error())
@@ -111,8 +110,6 @@ func getIsHealthyResponse(healthUrl string) error {
 		log.Println("Status code not 200!")
 		return fmt.Errorf("%s responded with a %d status code instead of 200", healthUrl, resp.StatusCode)
 	}
-
-	log.Println("Looks good ", healthUrl, resp)
 
 	return nil
 
