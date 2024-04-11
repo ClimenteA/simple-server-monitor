@@ -43,7 +43,7 @@ func main() {
 	app.Use(logger.New())
 	app.Use(recover.New())
 
-	app.Get("/", func(c *fiber.Ctx) error {
+	app.Get("/simple-server-monitor/notifications", func(c *fiber.Ctx) error {
 		results, err := handlers.GetAll()
 		if err != nil {
 			c.Status(500)
@@ -54,7 +54,7 @@ func main() {
 		return c.JSON(map[string][]handlers.ServerEvent{"data": parsedResults})
 	})
 
-	app.Post("/save", func(c *fiber.Ctx) error {
+	app.Post("/simple-server-monitor/save", func(c *fiber.Ctx) error {
 		var err error
 
 		event := new(handlers.ServerEvent)
@@ -73,7 +73,7 @@ func main() {
 
 	})
 
-	app.Delete("/delete/:eventId", func(c *fiber.Ctx) error {
+	app.Delete("/simple-server-monitor/delete/:eventId", func(c *fiber.Ctx) error {
 		var err error
 
 		eventId := c.Params("eventId")
@@ -89,7 +89,7 @@ func main() {
 
 	})
 
-	app.Delete("/clear-database", func(c *fiber.Ctx) error {
+	app.Delete("/simple-server-monitor/clear-database", func(c *fiber.Ctx) error {
 		err := handlers.Clear()
 		if err != nil {
 			log.Println(err)

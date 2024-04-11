@@ -161,7 +161,7 @@ async function setEvents() {
 
                 try {
 
-                    const response = await fetch(data.url, {
+                    const response = await fetch(data.url + "/notifications", {
                         method: "GET",
                         headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
                     })

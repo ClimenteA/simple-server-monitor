@@ -1,0 +1,47 @@
+version: '3'
+
+services:
+
+    
+  ssm:
+    build:
+      context: .
+      dockerfile: SSM.Dockerfile
+    volumes:
+      - ssmbadgerdata:/home/.badger
+    env_file:
+      - .env
+    ports:
+      - 4325:4325
+    networks:
+      - web
+
+      
+  ssmproxy:
+    image: caddy:2-alpine
+    restart: unless-stopped
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./public:/srv
+      - $PWD/Caddyfile:/etc/caddy/Caddyfile
+      - ssmcaddydata:/data
+      - ssmcaddyconfig:/config
+    env_file:
+      - .env
+    depends_on:
+      - ssm
+    networks:
+      - web
+
+networks:
+  web:
+    driver: bridge
+
+volumes:
+  ssmbadgerdata:
+  ssmcaddydata:
+  ssmcaddyconfig:
+
+      

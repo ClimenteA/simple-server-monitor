@@ -55,7 +55,7 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
             let receviedEvents
 
             try {
-                const response = await fetch(data.url, {
+                const response = await fetch(data.url + "/notifications", {
                     method: "GET",
                     headers: { "Content-Type": "application/json", "ApiKey": data.apiKey }
                 })

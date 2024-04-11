@@ -43,9 +43,6 @@ The View settings modal has 3 fields:
 - Settings table: you can delete settings one by one by clicking 'Delete' or you can edit one row by clicking 'Edit' and then clicking 'Save settings' button to save.
 
 
-
-
-
 # RestAPI
 
 You can choose to use the Go binary setup or just recreate these routes in the webframework and programming language of your choice. 
@@ -58,7 +55,7 @@ Request (status code: `200` or `500`)::
 
 ```shell
 curl  -X GET \
-  'http://localhost:3000' \
+  'http://localhost:3000/simple-server-monitor/notifications' \
   --header 'Accept: */*' \
   --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
   --header 'ApiKey: bdeef21a30cc0af802ac634ab2127817'
@@ -86,7 +83,7 @@ From your web app send this POST request to `Is My Server Ok`.
 
 ```shell
 curl  -X POST \
-  'http://localhost:3000/save' \
+  'http://localhost:3000/simple-server-monitor/save' \
   --header 'Accept: */*' \
   --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
   --header 'ApiKey: bdeef21a30cc0af802ac634ab2127817' \
@@ -111,7 +108,7 @@ You can also delete and event by it's EventId value.
 ```shell
 
 curl  -X DELETE \
-  'http://localhost:3000/delete/{path parameter EventId}' \
+  'http://localhost:3000/simple-server-monitor/delete/{path parameter EventId}' \
   --header 'Accept: */*' \
   --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
   --header 'ApiKey: bdeef21a30cc0af802ac634ab2127817'
@@ -133,7 +130,7 @@ Request:
 
 ```shell
 curl  -X POST \
-  'http://localhost:3000/clear-database' \
+  'http://localhost:3000/simple-server-monitor/clear-database' \
   --header 'Accept: */*' \
   --header 'User-Agent: Thunder Client (https://www.thunderclient.com)' \
   --header 'ApiKey: bdeef21a30cc0af802ac634ab2127817'
