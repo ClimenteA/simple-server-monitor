@@ -28,6 +28,25 @@ async function showNotification(alarmName) {
 }
 
 
+/**
+ * @param {Object[]} receviedEvents 
+ * @param {string} receviedEvents[].Id
+ * @param {string} receviedEvents[].Title 
+ * @param {string} receviedEvents[].Message
+ * @param {string} receviedEvents[].Level
+ * @param {string} receviedEvents[].Timestamp
+ * @returns {receviedEvents}
+ */
+function filterReceviedEvents(receviedEvents) {
+    let filteredList = []
+    for (let ev of receviedEvents) {
+        if (ev.Title.endsWith("@rightbliss.beauty")) continue
+        filteredList.push(ev)
+    }
+    return filteredList
+}
+
+
 chrome.storage.onChanged.addListener(async function (changes, areaName) {
     if (changes.events && areaName == "local") {
         const event = Object.values(changes.events?.newValue)[0]
@@ -63,6 +82,8 @@ chrome.alarms.onAlarm.addListener(async function (alarm) {
                 if (response.status != 200) return
                 receviedEvents = await response.json()
                 if (!receviedEvents.data) return
+                receviedEvents = filterReceviedEvents(receviedEvents.data)
+                if (receviedEvents.length == 0) return
 
             } catch (error) {
                 console.info("cannot fetch notifications", error)
