@@ -49,9 +49,9 @@ function filterReceviedEvents(receviedEvents) {
 
 chrome.storage.onChanged.addListener(async function (changes, areaName) {
     if (changes.events && areaName == "local") {
-        const event = Object.values(changes.events?.newValue)[0]
+        const event = Object.values(changes.events?.newValue)
         if (!event) return
-        if (event.EventId.startsWith("server-error")) {
+        if (event[0].EventId.startsWith("server-error")) {
             await showNotification("Server down")
         } else {
             await showNotification(event.Origin.url)
