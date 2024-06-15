@@ -1,5 +1,8 @@
 # Is My Server Ok
 
+> **Not maintained anymore**
+> **I noticed the notifications were flaky after a while.**
+
 Monitor your web apps with a simple chrome extension. Get notified on events you consider important (server resources CPU, RAM, Disk reached limit, new user signup, etc). 
 Using [Go Fiber](https://gofiber.io/) and [Badger KV DB](https://dgraph.io/docs/badger/) to output maximum performance.  
 
